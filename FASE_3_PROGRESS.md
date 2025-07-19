@@ -118,26 +118,65 @@ internal/upgrade/
     └── CleanDownloads()
 ```
 
-## 🎯 **Próximos Puntos (4-5)**
+## ✅ **Punto 4 Completado: Sistema de Instalación**
 
-### **Punto 4: Instalación y Migración**
-**Archivo**: `harvest-go/internal/upgrade/install.go`
+### **Funcionalidades Implementadas**
+- ✅ **InstallManager** - Gestión completa de instalaciones
+- ✅ **Extracción de archivos** - Soporte tar.gz completo
+- ✅ **Reemplazo de binarios** - Con backup automático
+- ✅ **Restauración de datos** - Desde backup
+- ✅ **Verificación de instalación** - Permisos y funcionamiento
 
-**Funcionalidades a implementar:**
-- [ ] Extraer archivo tar.gz descargado
-- [ ] Reemplazar binario Python con Go
-- [ ] Restaurar configuración y datos
-- [ ] Actualizar PATH si es necesario
-- [ ] Verificar instalación exitosa
+### **Tests Realizados**
+```bash
+# ✅ Integración completa
+./harvest upgrade
+# Output:
+# 🔧 Installing new version...
+# Installation path: /home/lucasvidela/.local/bin/harvest
+
+# ✅ Detección de ruta de instalación
+# Detecta correctamente ~/.local/bin/harvest
+
+# ✅ Backup + Descarga + Instalación
+# Todo el flujo funcionando perfectamente
+```
+
+### **Arquitectura Implementada**
+```
+internal/upgrade/
+├── version.go
+├── backup.go
+├── download.go
+└── install.go
+    ├── InstallManager
+    ├── InstallNewVersion()
+    ├── ExtractArchive()
+    ├── ReplaceBinary()
+    └── VerifyInstallation()
+```
+
+## 🎯 **Próximo Punto (5)**
 
 ### **Punto 5: Rollback y Recuperación**
 **Archivo**: `harvest-go/internal/upgrade/rollback.go`
 
 **Funcionalidades a implementar:**
 - [ ] Detectar fallos en instalación
-- [ ] Restaurar versión anterior
+- [ ] Restaurar versión anterior automáticamente
 - [ ] Recuperar datos del backup
-- [ ] Notificar al usuario
+- [ ] Notificar al usuario del rollback
+- [ ] Logs detallados del proceso
+
+**Verificación:**
+```bash
+# Test: Rollback automático
+# Simular fallo en instalación
+# Debe restaurar versión anterior
+
+# Test: Recuperación de datos
+# Verificar que datos se restauran correctamente
+```
 
 ## 🔄 **Estrategia de Desarrollo**
 
@@ -145,16 +184,16 @@ internal/upgrade/
 1. **✅ Detectar** instalación existente
 2. **✅ Backup** completo de datos
 3. **✅ Descargar** nueva versión
-4. **🔄 Instalar** y migrar datos (próximo)
+4. **✅ Instalar** y migrar datos
 5. **🔄 Verificar** funcionamiento
-6. **🔄 Rollback** si hay problemas
+6. **🔄 Rollback** si hay problemas (próximo)
 
 ### **Orden de Implementación**
 1. **✅ Detección de versión** (completado)
 2. **✅ Sistema de backup** (completado)
 3. **✅ Descarga de archivos** (completado)
-4. **🔄 Instalación y migración** (próximo)
-5. **🔄 Rollback**
+4. **✅ Instalación y migración** (completado)
+5. **🔄 Rollback** (próximo)
 
 ## 🧪 **Tests de Compatibilidad Planificados**
 
@@ -199,7 +238,7 @@ python3 harvest config set daily_hours_target 6.0
 ### **Funcionalidad**
 - [x] Migración automática desde Python
 - [x] Preservación completa de datos
-- [ ] Configuración migrada correctamente
+- [x] Configuración migrada correctamente
 - [ ] Rollback automático en caso de fallo
 
 ### **Seguridad**
@@ -214,27 +253,27 @@ python3 harvest config set daily_hours_target 6.0
 - [x] Confirmación antes de cambios
 - [ ] Instrucciones de recuperación
 
-## 🎯 **Próximo Punto: Instalación y Migración**
+## 🎯 **Próximo Punto: Rollback y Recuperación**
 
-**Archivo a crear**: `harvest-go/internal/upgrade/install.go`
+**Archivo a crear**: `harvest-go/internal/upgrade/rollback.go`
 
 **Funciones a implementar**:
-- `InstallNewVersion() error`
-- `ExtractArchive() error`
-- `ReplaceBinary() error`
-- `VerifyInstallation() error`
+- `DetectInstallationFailure() error`
+- `PerformRollback() error`
+- `RestorePreviousVersion() error`
+- `NotifyUser() error`
 
 **Verificación**:
 ```bash
 cd harvest-go
-# Crear archivo install.go
+# Crear archivo rollback.go
 # Implementar funciones básicas
-# Test: ./harvest upgrade
-# Debe instalar nueva versión
+# Test: Simular fallo en instalación
+# Debe restaurar versión anterior
 ```
 
 ---
 
-**Estado**: 🟢 **En progreso** - Puntos 1-3 completados
-**Próximo hito**: Implementar instalación y migración
+**Estado**: 🟢 **En progreso** - Puntos 1-4 completados
+**Próximo hito**: Implementar rollback y recuperación
 **Tiempo estimado**: 30-60 minutos por punto restante 

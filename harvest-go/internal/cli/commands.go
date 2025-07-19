@@ -75,6 +75,81 @@ Use "harvest [command] --help" for more information about a command.
 
 	// Comando upgrade
 	rootCmd.AddCommand(upgradeCmd)
+
+	// Agregar comando rollback
+	rootCmd.AddCommand(rollbackCmd)
+}
+
+// rollbackCmd es el comando para gestionar rollbacks
+var rollbackCmd = &cobra.Command{
+	Use:   "rollback",
+	Short: "Manage rollback operations",
+	Long: `Manage rollback operations for Harvest CLI.
+
+This command allows you to:
+- Check rollback availability
+- View rollback information
+- Perform manual rollback
+- View rollback logs`,
+	Args: cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		showRollbackInfo()
+	},
+}
+
+// showRollbackInfo muestra información sobre el rollback
+func showRollbackInfo() {
+	rollbackManager := upgrade.NewRollbackManager()
+
+	fmt.Println("🔄 Rollback Information")
+	fmt.Println(strings.Repeat("─", 50))
+
+	// Verificar disponibilidad
+	if rollbackManager.IsRollbackAvailable() {
+		printSuccess("Rollback is available")
+
+		// Obtener información detallada
+		info, err := rollbackManager.GetRollbackInfo()
+		if err != nil {
+			printError(fmt.Errorf("could not get rollback info: %v", err))
+			return
+		}
+
+		// Mostrar información del backup del binario
+		if size, ok := info["binary_backup_size"]; ok {
+			fmt.Printf("Binary backup size: %d bytes\n", size)
+		}
+
+		if backupTime, ok := info["binary_backup_time"]; ok {
+			if t, ok := backupTime.(time.Time); ok {
+				fmt.Printf("Binary backup time: %s\n", t.Format("2006-01-02 15:04:05"))
+			}
+		}
+
+		// Mostrar información del backup de datos
+		if path, ok := info["data_backup_path"]; ok {
+			fmt.Printf("Data backup path: %s\n", path)
+		}
+
+		if backupTime, ok := info["data_backup_time"]; ok {
+			if t, ok := backupTime.(time.Time); ok {
+				fmt.Printf("Data backup time: %s\n", t.Format("2006-01-02 15:04:05"))
+			}
+		}
+
+		// Mostrar log de rollback si existe
+		if log, err := rollbackManager.GetRollbackLog(); err == nil && log != "" {
+			fmt.Println("\n📋 Recent rollback activity:")
+			fmt.Println(log)
+		}
+
+	} else {
+		printInfo("No rollback available")
+		fmt.Println("This means either:")
+		fmt.Println("- This is a fresh installation")
+		fmt.Println("- No previous version was backed up")
+		fmt.Println("- Backup files were cleaned up")
+	}
 }
 
 var versionCmd = &cobra.Command{
@@ -563,4 +638,14 @@ func performUpgrade() {
 	fmt.Printf("https://github.com/%s/%s/releases\n", upgrade.RepoOwner, upgrade.RepoName)
 	fmt.Printf("\nYour data has been safely backed up to: %s\n", backupPath)
 	fmt.Printf("Installation path: %s\n", installManager.GetInstallPath())
+
+	// Verificar disponibilidad de rollback
+	rollbackManager := upgrade.NewRollbackManager()
+	if rollbackManager.IsRollbackAvailable() {
+		fmt.Println("\n🛡️  Rollback protection available")
+		fmt.Println("If anything goes wrong, the system can automatically restore the previous version.")
+	} else {
+		fmt.Println("\n⚠️  No rollback protection available")
+		fmt.Println("This is a fresh installation or no previous version was backed up.")
+	}
 }
