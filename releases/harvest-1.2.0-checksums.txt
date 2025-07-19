@@ -1,0 +1,6 @@
+ba0f4ad1e4970d6d2ddb6e65225c3ecf2b9f3232089feb0bc8188ff5527a41f9  harvest-1.2.0-darwin-amd64.tar.gz
+51231682f6ab5fba13aee5b2ec62710267ef933aa26bcc1970d461ce27b49416  harvest-1.2.0-darwin-arm64.tar.gz
+2ecb36fdd70cd24d47a628edfc85c93536079dec2decf62bbfbda5e27b820bf1  harvest-1.2.0-linux-amd64.tar.gz
+d94c1b27340dcc269409bc4860ac897e83e1b6f67731049d75ae8627ea733b50  harvest-1.2.0-linux-arm64.tar.gz
+276c22df8bd18d79646b710d82be34b0748ca9ff1fd709f85a7e7c7d48cbf3e3  harvest-1.2.0-windows-amd64.tar.gz
+849788e6a202c565f326af8b7321a493744f7ac47797fa09a1bca44c4caf14b7  harvest-1.2.0-windows-amd64.zip

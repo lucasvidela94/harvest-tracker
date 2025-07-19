@@ -2,20 +2,22 @@
 
 Una herramienta de línea de comandos para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
 
+> **Nota**: Este proyecto ha sido migrado completamente a Go para mejor rendimiento y mantenibilidad.
+
 ## 🚀 Instalación Rápida
 
-### Opción 1: Instalación Automática (Recomendada)
+### Instalación Automática (Recomendada)
 
 ```bash
 # Clonar el repositorio
 git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker/harvest-go
+cd harvest-tracker
 
 # Instalar usando el script automático
 ./install.sh
 ```
 
-### Opción 2: Instalación Manual
+### Instalación Manual
 
 ```bash
 # Compilar e instalar
@@ -24,18 +26,6 @@ make install-script
 # O manualmente
 make build
 make install
-```
-
-### Opción 3: Desde el código fuente
-
-```bash
-# Clonar y compilar
-git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker/harvest-go
-go build -o harvest ./cmd/harvest
-
-# Mover a PATH
-sudo mv harvest /usr/local/bin/
 ```
 
 ## 📋 Uso
@@ -83,13 +73,6 @@ El CLI se configura automáticamente en `~/.harvest/`:
 - `config.json` - Configuración general
 - `tasks.json` - Datos de tareas
 
-### Configuración de Daily Standup
-
-```bash
-# Configurar horas del daily (por defecto: 0.25h)
-# Se puede modificar en ~/.harvest/config.json
-```
-
 ## 🔄 Actualizaciones
 
 El sistema incluye un sistema de upgrade automático:
@@ -97,13 +80,6 @@ El sistema incluye un sistema de upgrade automático:
 ```bash
 # Verificar actualizaciones
 harvest upgrade
-
-# El sistema:
-# 1. Detecta la versión actual
-# 2. Crea backup automático
-# 3. Descarga nueva versión
-# 4. Instala y migra datos
-# 5. Proporciona rollback automático
 ```
 
 ## 🛡️ Seguridad
@@ -145,13 +121,6 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Problemas de permisos
-
-```bash
-# Hacer ejecutable
-chmod +x ~/.local/bin/harvest
-```
-
 ### Verificar instalación
 
 ```bash
@@ -167,7 +136,7 @@ harvest --help
 ```bash
 # Clonar repositorio
 git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker/harvest-go
+cd harvest-tracker
 
 # Instalar dependencias
 go mod tidy
@@ -201,16 +170,27 @@ make dev
 ## 📁 Estructura del Proyecto
 
 ```
-harvest-go/
+harvest/
 ├── cmd/harvest/          # Punto de entrada
-├── internal/
+├── internal/             # Lógica interna
 │   ├── cli/             # Comandos CLI
 │   ├── core/            # Lógica principal
 │   └── upgrade/         # Sistema de upgrade
 ├── pkg/harvest/         # Tipos y utilidades
+├── build/               # Archivos de build
+├── releases/            # Releases compilados
+├── harvest-python-backup/ # Backup del código Python anterior
 ├── install.sh           # Script de instalación
 ├── uninstall.sh         # Script de desinstalación
-└── Makefile             # Comandos de build
+├── release.sh           # Script de release
+├── Makefile             # Comandos de build
+├── go.mod               # Dependencias Go
+├── go.sum               # Checksums de dependencias
+├── README.md            # Este archivo
+├── CHANGELOG.md         # Historial de cambios
+├── LICENSE              # Licencia del proyecto
+├── VERSION              # Versión actual
+└── harvest              # Ejecutable compilado
 ```
 
 ## 🤝 Contribuir
