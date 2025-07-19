@@ -38,16 +38,50 @@ internal/upgrade/
     └── GetUpgradeInfo()
 ```
 
-## 🎯 **Próximos Puntos (2-5)**
+## ✅ **Punto 2 Completado: Sistema de Backup**
 
-### **Punto 2: Backup de Datos**
-**Archivo**: `harvest-go/internal/upgrade/backup.go`
+### **Funcionalidades Implementadas**
+- ✅ **BackupManager** - Gestión completa de backups
+- ✅ **Backup automático** - Antes de upgrade/migración
+- ✅ **Verificación de integridad** - Valida archivos críticos
+- ✅ **Sistema de restauración** - Desde backup más reciente
+- ✅ **Metadata detallado** - Información completa del backup
 
-**Funcionalidades a implementar:**
-- [ ] Crear backup de configuración Python
-- [ ] Crear backup de datos de tareas
-- [ ] Crear backup de archivos de instalación
-- [ ] Verificar integridad del backup
+### **Tests Realizados**
+```bash
+# ✅ Backup automático
+./harvest upgrade
+# Output:
+# 💾 Creating backup of your data...
+# ✅ Backup created successfully at: /home/lucasvidela/.harvest/backup
+
+# ✅ Verificación de integridad
+# Verifica archivos críticos y metadata
+
+# ✅ Estructura del backup
+ls ~/.harvest/backup/
+# backup_2025-07-19_02-56-04/
+# latest -> backup_2025-07-19_02-56-04
+
+# ✅ Archivos preservados
+ls ~/.harvest/backup/backup_2025-07-19_02-56-04/
+# backup.json, config.json, tasks.json
+```
+
+### **Arquitectura Implementada**
+```
+internal/upgrade/
+├── version.go
+└── backup.go
+    ├── BackupManager
+    ├── CreateBackup()
+    ├── RestoreBackup()
+    ├── VerifyBackup()
+    ├── GetLatestBackupPath()
+    └── CleanOldBackups()
+```
+
+## 🎯 **Próximos Puntos (3-5)**
 
 ### **Punto 3: Descarga de Nueva Versión**
 **Archivo**: `harvest-go/internal/upgrade/download.go`
@@ -80,16 +114,16 @@ internal/upgrade/
 
 ### **Metodología: Migración Segura**
 1. **✅ Detectar** instalación existente
-2. **🔄 Backup** completo de datos (próximo)
-3. **🔄 Descargar** nueva versión
+2. **✅ Backup** completo de datos
+3. **🔄 Descargar** nueva versión (próximo)
 4. **🔄 Instalar** y migrar datos
 5. **🔄 Verificar** funcionamiento
 6. **🔄 Rollback** si hay problemas
 
 ### **Orden de Implementación**
 1. **✅ Detección de versión** (completado)
-2. **🔄 Sistema de backup** (próximo)
-3. **🔄 Descarga de archivos**
+2. **✅ Sistema de backup** (completado)
+3. **🔄 Descarga de archivos** (próximo)
 4. **🔄 Instalación y migración**
 5. **🔄 Rollback**
 
@@ -135,13 +169,13 @@ python3 harvest config set daily_hours_target 6.0
 
 ### **Funcionalidad**
 - [x] Migración automática desde Python
-- [ ] Preservación completa de datos
+- [x] Preservación completa de datos
 - [ ] Configuración migrada correctamente
 - [ ] Rollback automático en caso de fallo
 
 ### **Seguridad**
-- [ ] Backup completo antes de migración
-- [ ] Verificación de integridad
+- [x] Backup completo antes de migración
+- [x] Verificación de integridad
 - [ ] Rollback automático
 - [ ] Notificaciones claras al usuario
 
@@ -151,27 +185,27 @@ python3 harvest config set daily_hours_target 6.0
 - [x] Confirmación antes de cambios
 - [ ] Instrucciones de recuperación
 
-## 🎯 **Próximo Punto: Sistema de Backup**
+## 🎯 **Próximo Punto: Descarga de Nueva Versión**
 
-**Archivo a crear**: `harvest-go/internal/upgrade/backup.go`
+**Archivo a crear**: `harvest-go/internal/upgrade/download.go`
 
 **Funciones a implementar**:
-- `CreateBackup() error`
-- `RestoreBackup() error`
-- `VerifyBackup() error`
-- `GetBackupPath() string`
+- `DownloadLatestVersion() error`
+- `GetDownloadURL() string`
+- `VerifyDownload() error`
+- `GetDownloadPath() string`
 
 **Verificación**:
 ```bash
 cd harvest-go
-# Crear archivo backup.go
+# Crear archivo download.go
 # Implementar funciones básicas
 # Test: ./harvest upgrade
-# Debe crear backup antes de proceder
+# Debe descargar binario desde GitHub
 ```
 
 ---
 
-**Estado**: 🟢 **En progreso** - Punto 1 completado
-**Próximo hito**: Implementar sistema de backup
+**Estado**: 🟢 **En progreso** - Puntos 1-2 completados
+**Próximo hito**: Implementar descarga de nueva versión
 **Tiempo estimado**: 30-60 minutos por punto restante 

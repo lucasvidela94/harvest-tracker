@@ -539,8 +539,21 @@ func performUpgrade() {
 	backupPath := backupManager.GetBackupPath()
 	printSuccess(fmt.Sprintf("Backup created successfully at: %s", backupPath))
 
-	// Por ahora, solo mostrar que el upgrade está en desarrollo
-	fmt.Println("\n🚧 Upgrade system is under development")
+	// Descargar nueva versión
+	fmt.Println("\n📥 Downloading latest version...")
+	downloadManager := upgrade.NewDownloadManager()
+
+	// Obtener URL de descarga
+	downloadURL, err := downloadManager.GetDownloadURL(info.LatestVersion)
+	if err != nil {
+		printError(fmt.Errorf("could not get download URL: %v", err))
+		return
+	}
+
+	fmt.Printf("Download URL: %s\n", downloadURL)
+
+	// Por ahora, solo mostrar información de descarga
+	fmt.Println("\n🚧 Download system is under development")
 	fmt.Println("This feature will be available in the next release.")
 	fmt.Println("For now, you can manually download the latest version from:")
 	fmt.Printf("https://github.com/%s/%s/releases\n", upgrade.RepoOwner, upgrade.RepoName)
