@@ -45,6 +45,20 @@ pip3 install --user pyperclip
 ./uninstall.sh
 ```
 
+### Actualización
+
+```bash
+harvest --upgrade
+```
+
+El sistema de actualización:
+- ✅ Verifica automáticamente si hay nuevas versiones disponibles
+- ✅ Descarga la última versión desde GitHub
+- ✅ Crea un backup automático de tus datos
+- ✅ Instala la nueva versión sin perder configuración
+- ✅ Restaura automáticamente tus datos después de la actualización
+- ✅ Preserva toda tu configuración y tareas existentes
+
 ## 📋 Comandos Principales
 
 ### `harvest` - Comando Principal
@@ -59,6 +73,7 @@ harvest add "Task" 1.0 doc       # Tarea genérica con categoría
 # Ver estado y reportes
 harvest status                   # Estado actual del día
 harvest report                   # Generar reporte para Harvest
+harvest --upgrade                # Actualizar a la última versión
 ```
 
 ### `finish` - Completar el Día

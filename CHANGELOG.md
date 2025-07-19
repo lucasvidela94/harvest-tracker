@@ -1,4 +1,21 @@
 # Changelog
+## [1.1.0] - 2025-01-08
+
+### Added
+- Sistema de actualización automática con `harvest --upgrade`
+- Verificación de versiones desde GitHub releases
+- Backup automático de datos del usuario antes de actualizar
+- Restauración automática de datos después de la actualización
+- Descarga automática de la última versión desde el repositorio
+- Preservación de configuración y datos del usuario durante actualizaciones
+
+### Changed
+- Mejorada la gestión de versiones con verificación automática
+- Agregado soporte para actualizaciones sin pérdida de datos
+
+### Fixed
+- Mejorada la robustez del sistema de instalación
+
 ## [1.0.2] - 2025-07-18
 
 ### Added
