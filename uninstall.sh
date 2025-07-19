@@ -66,10 +66,11 @@ remove_from_path() {
     
     case "$os" in
         linux|darwin)
-            if [[ -f "$HOME/.bashrc" ]]; then
-                shell_rc="$HOME/.bashrc"
-            elif [[ -f "$HOME/.zshrc" ]]; then
+            # Priorizar zshrc sobre bashrc para usuarios de zsh
+            if [[ -f "$HOME/.zshrc" ]]; then
                 shell_rc="$HOME/.zshrc"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                shell_rc="$HOME/.bashrc"
             elif [[ -f "$HOME/.profile" ]]; then
                 shell_rc="$HOME/.profile"
             fi
@@ -84,11 +85,17 @@ remove_from_path() {
         # Crear backup del archivo
         cp "$shell_rc" "$shell_rc.backup"
         
-        # Remover líneas relacionadas con Harvest
-        sed -i '/# Harvest CLI/d' "$shell_rc"
-        sed -i "/export PATH.*$install_dir/d" "$shell_rc"
-        
-        print_success "Removido del PATH en $shell_rc"
+        # Remover líneas relacionadas con Harvest (de forma más segura)
+        if grep -q "harvest" "$shell_rc"; then
+            # Remover líneas que contengan alias de harvest
+            sed -i '/alias harvest=/d' "$shell_rc"
+            sed -i '/alias finish=/d' "$shell_rc"
+            sed -i '/alias week=/d' "$shell_rc"
+            
+            print_success "Removido del PATH en $shell_rc"
+        else
+            print_info "No se encontraron configuraciones de Harvest en $shell_rc"
+        fi
     else
         print_warning "No se pudo encontrar archivo de configuración del shell"
         print_info "Remueve manualmente $install_dir del PATH"

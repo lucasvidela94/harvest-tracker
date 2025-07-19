@@ -84,6 +84,86 @@ check_path() {
     return 1
 }
 
+# Función para detectar configuraciones previas
+detect_previous_config() {
+    local os=$(detect_os)
+    local shell_rc=""
+    local found_configs=()
+    
+    case "$os" in
+        linux|darwin)
+            # Priorizar zshrc sobre bashrc para usuarios de zsh
+            if [[ -f "$HOME/.zshrc" ]]; then
+                shell_rc="$HOME/.zshrc"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                shell_rc="$HOME/.bashrc"
+            elif [[ -f "$HOME/.profile" ]]; then
+                shell_rc="$HOME/.profile"
+            fi
+            ;;
+    esac
+    
+    if [[ -n "$shell_rc" ]]; then
+        # Buscar alias de harvest
+        if grep -q "alias harvest=" "$shell_rc"; then
+            found_configs+=("alias harvest en $shell_rc")
+        fi
+        
+        # Buscar alias de finish
+        if grep -q "alias finish=" "$shell_rc"; then
+            found_configs+=("alias finish en $shell_rc")
+        fi
+        
+        # Buscar alias de week
+        if grep -q "alias week=" "$shell_rc"; then
+            found_configs+=("alias week en $shell_rc")
+        fi
+        
+        # Buscar configuraciones de PATH
+        if grep -q "export PATH.*harvest" "$shell_rc"; then
+            found_configs+=("configuración de PATH en $shell_rc")
+        fi
+    fi
+    
+    echo "${found_configs[@]}"
+}
+
+# Función para limpiar configuraciones previas
+cleanup_previous_config() {
+    local os=$(detect_os)
+    local shell_rc=""
+    
+    case "$os" in
+        linux|darwin)
+            # Priorizar zshrc sobre bashrc para usuarios de zsh
+            if [[ -f "$HOME/.zshrc" ]]; then
+                shell_rc="$HOME/.zshrc"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                shell_rc="$HOME/.bashrc"
+            elif [[ -f "$HOME/.profile" ]]; then
+                shell_rc="$HOME/.profile"
+            fi
+            ;;
+    esac
+    
+    if [[ -n "$shell_rc" ]]; then
+        # Crear backup
+        cp "$shell_rc" "$shell_rc.backup"
+        
+        # Remover configuraciones previas
+        if grep -q "harvest" "$shell_rc"; then
+            sed -i '/alias harvest=/d' "$shell_rc"
+            sed -i '/alias finish=/d' "$shell_rc"
+            sed -i '/alias week=/d' "$shell_rc"
+            sed -i '/# Harvest CLI/d' "$shell_rc"
+            sed -i '/export PATH.*harvest/d' "$shell_rc"
+            
+            print_success "Configuraciones previas removidas de $shell_rc"
+            print_info "Backup creado en $shell_rc.backup"
+        fi
+    fi
+}
+
 # Función para agregar al PATH
 add_to_path() {
     local install_dir="$1"
@@ -92,10 +172,11 @@ add_to_path() {
     
     case "$os" in
         linux|darwin)
-            if [[ -f "$HOME/.bashrc" ]]; then
-                shell_rc="$HOME/.bashrc"
-            elif [[ -f "$HOME/.zshrc" ]]; then
+            # Priorizar zshrc sobre bashrc para usuarios de zsh
+            if [[ -f "$HOME/.zshrc" ]]; then
                 shell_rc="$HOME/.zshrc"
+            elif [[ -f "$HOME/.bashrc" ]]; then
+                shell_rc="$HOME/.bashrc"
             elif [[ -f "$HOME/.profile" ]]; then
                 shell_rc="$HOME/.profile"
             fi
@@ -142,6 +223,27 @@ main() {
     if [[ ! -f "go.mod" ]]; then
         print_error "No se encontró go.mod. Ejecuta desde el directorio del proyecto."
         exit 1
+    fi
+    
+    # Detectar configuraciones previas
+    print_info "🔍 Verificando configuraciones previas..."
+    local previous_configs=$(detect_previous_config)
+    
+    if [[ -n "$previous_configs" ]]; then
+        print_warning "Se encontraron configuraciones previas:"
+        for config in $previous_configs; do
+            echo "  - $config"
+        done
+        
+        print_warning "¿Deseas limpiar las configuraciones previas? (y/N)"
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            cleanup_previous_config
+        else
+            print_info "Continuando con configuraciones existentes..."
+        fi
+    else
+        print_success "No se encontraron configuraciones previas"
     fi
     
     # Compilar el proyecto
