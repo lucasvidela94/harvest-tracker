@@ -1,4 +1,16 @@
 # Changelog
+## [1.0.2] - 2025-07-18
+
+### Added
+- Nuevas características en esta versión
+
+### Changed
+- Cambios en funcionalidades existentes
+
+### Fixed
+- Correcciones de bugs
+
+
 
 All notable changes to this project will be documented in this file.
 
