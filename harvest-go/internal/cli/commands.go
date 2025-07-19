@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lucasvidela94/harvest-cli/internal/core"
+	"github.com/lucasvidela94/harvest-cli/internal/upgrade"
 	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
 	"github.com/spf13/cobra"
 )
@@ -71,6 +72,9 @@ Use "harvest [command] --help" for more information about a command.
 
 	// Comando report
 	rootCmd.AddCommand(reportCmd)
+
+	// Comando upgrade
+	rootCmd.AddCommand(upgradeCmd)
 }
 
 var versionCmd = &cobra.Command{
@@ -453,4 +457,73 @@ func copyToClipboard(tasks []harvest.Task) error {
 	}
 
 	return nil
+}
+
+// upgradeCmd es el comando para actualizar Harvest CLI
+var upgradeCmd = &cobra.Command{
+	Use:   "upgrade",
+	Short: "Upgrade to latest version",
+	Long: `Upgrade Harvest CLI to the latest version.
+
+This command will:
+1. Check for available updates
+2. Backup your current data
+3. Download the latest version
+4. Install the new version
+5. Restore your data
+
+If you're currently using the Python version, this will migrate you to Go.`,
+	Args: cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		performUpgrade()
+	},
+}
+
+// performUpgrade ejecuta el proceso de upgrade
+func performUpgrade() {
+	fmt.Println("🔍 Checking for updates...")
+
+	// Crear gestor de versiones
+	vm := upgrade.NewVersionManager()
+
+	// Obtener información de upgrade
+	info, err := vm.GetUpgradeInfo()
+	if err != nil {
+		printError(fmt.Errorf("could not check for updates: %v", err))
+		return
+	}
+
+	// Mostrar información actual
+	fmt.Printf("📊 Current version: %s\n", info.CurrentVersion)
+	fmt.Printf("📦 Latest version: %s\n", info.LatestVersion)
+
+	if !info.HasUpdate {
+		printSuccess("You are currently on the latest version!")
+		return
+	}
+
+	// Mostrar información de migración
+	if !info.IsGoInstallation {
+		fmt.Println("\n🔄 Migration detected: Python → Go")
+		fmt.Println("This will migrate your installation from Python to Go while preserving all your data.")
+	} else {
+		fmt.Println("\n⬆️  Update available")
+		fmt.Println("This will update your Go installation to the latest version.")
+	}
+
+	// Confirmar upgrade
+	fmt.Print("\nDo you want to proceed with the upgrade? (y/N): ")
+	var response string
+	fmt.Scanln(&response)
+
+	if strings.ToLower(strings.TrimSpace(response)) != "y" && strings.ToLower(strings.TrimSpace(response)) != "yes" {
+		printInfo("Upgrade cancelled")
+		return
+	}
+
+	// Por ahora, solo mostrar que el upgrade está en desarrollo
+	fmt.Println("\n🚧 Upgrade system is under development")
+	fmt.Println("This feature will be available in the next release.")
+	fmt.Println("For now, you can manually download the latest version from:")
+	fmt.Printf("https://github.com/%s/%s/releases\n", upgrade.RepoOwner, upgrade.RepoName)
 }
