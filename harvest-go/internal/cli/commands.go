@@ -521,9 +521,28 @@ func performUpgrade() {
 		return
 	}
 
+	// Crear backup antes de proceder
+	fmt.Println("\n💾 Creating backup of your data...")
+	backupManager := upgrade.NewBackupManager()
+
+	if err := backupManager.CreateBackup(); err != nil {
+		printError(fmt.Errorf("could not create backup: %v", err))
+		return
+	}
+
+	// Verificar integridad del backup
+	if err := backupManager.VerifyBackup(); err != nil {
+		printError(fmt.Errorf("backup verification failed: %v", err))
+		return
+	}
+
+	backupPath := backupManager.GetBackupPath()
+	printSuccess(fmt.Sprintf("Backup created successfully at: %s", backupPath))
+
 	// Por ahora, solo mostrar que el upgrade está en desarrollo
 	fmt.Println("\n🚧 Upgrade system is under development")
 	fmt.Println("This feature will be available in the next release.")
 	fmt.Println("For now, you can manually download the latest version from:")
 	fmt.Printf("https://github.com/%s/%s/releases\n", upgrade.RepoOwner, upgrade.RepoName)
+	fmt.Printf("\nYour data has been safely backed up to: %s\n", backupPath)
 }
