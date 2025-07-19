@@ -1,6 +1,9 @@
-# 🌾 Harvest Scripts v1.0
+# 🌾 Harvest Scripts v1.0.0
 
 Sistema simple y directo para gestionar tareas de Harvest desde la línea de comandos.
+
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](VERSION)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## 🚀 Instalación
 
@@ -165,4 +168,43 @@ Total: 8.25h
 
 ## 🎉 ¡Listo para usar!
 
-El sistema está diseñado para ser simple, rápido y efectivo. Sin complicaciones, solo comandos directos que funcionan. 
+El sistema está diseñado para ser simple, rápido y efectivo. Sin complicaciones, solo comandos directos que funcionan.
+
+## 📦 Versionado y Releases
+
+Este proyecto sigue [Semantic Versioning](https://semver.org/). Para crear un nuevo release:
+
+```bash
+# Release de parche (1.0.0 -> 1.0.1)
+./release.sh patch
+
+# Release menor (1.0.0 -> 1.1.0)
+./release.sh minor
+
+# Release mayor (1.0.0 -> 2.0.0)
+./release.sh major
+```
+
+### Estructura de Versionado
+
+- **MAJOR**: Cambios incompatibles con versiones anteriores
+- **MINOR**: Nuevas funcionalidades compatibles hacia atrás
+- **PATCH**: Correcciones de bugs compatibles hacia atrás
+
+### Archivos de Versionado
+
+- `VERSION` - Versión actual del proyecto
+- `CHANGELOG.md` - Historial de cambios
+- `release.sh` - Script para automatizar releases
+
+### Git Tags
+
+Cada release se etiqueta automáticamente:
+```bash
+git tag -l                    # Ver todos los tags
+git show v1.0.0              # Ver detalles del release
+```
+
+## 📄 Licencia
+
+MIT License - Ver [LICENSE](LICENSE) para más detalles. 
