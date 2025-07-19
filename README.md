@@ -1,225 +1,238 @@
-# 🌾 Harvest Scripts v1.0.0
+# 🌾 Harvest CLI
 
-Sistema simple y directo para gestionar tareas de Harvest desde la línea de comandos.
+Una herramienta de línea de comandos para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](VERSION)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+## 🚀 Instalación Rápida
 
-## 🚀 Instalación
-
-### Instalación Automática (Recomendada)
+### Opción 1: Instalación Automática (Recomendada)
 
 ```bash
-# Instalar scripts
+# Clonar el repositorio
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker/harvest-go
+
+# Instalar usando el script automático
 ./install.sh
 ```
 
-El script de instalación:
-- ✅ Detecta automáticamente tu shell (zsh, bash, etc.)
-- ✅ Crea la configuración en `~/.harvest/`
-- ✅ Instala dependencias (pyperclip)
-- ✅ Configura aliases permanentes en tu shell
-- ✅ Recarga la configuración automáticamente
-
-### Instalación Manual
-
-Si prefieres configurar manualmente:
+### Opción 2: Instalación Manual
 
 ```bash
-# Agregar a ~/.zshrc o ~/.bashrc:
-alias harvest='~/scripts/harvest/harvest'
-alias finish='~/scripts/harvest/finish'
-alias week='~/scripts/harvest/week'
+# Compilar e instalar
+make install-script
 
-# Crear configuración
-mkdir -p ~/.harvest
-echo '{"daily_hours_target": 8.0, "daily_standup_hours": 0.25, "data_file": "~/.harvest/tasks.json"}' > ~/.harvest/config.json
+# O manualmente
+make build
+make install
+```
+
+### Opción 3: Desde el código fuente
+
+```bash
+# Clonar y compilar
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker/harvest-go
+go build -o harvest ./cmd/harvest
+
+# Mover a PATH
+sudo mv harvest /usr/local/bin/
+```
+
+## 📋 Uso
+
+Una vez instalado, puedes usar `harvest` desde cualquier lugar:
+
+```bash
+# Ver ayuda
+harvest --help
+
+# Agregar una tarea
+harvest add "Desarrollar nueva funcionalidad" 4.0
+
+# Ver estado actual
+harvest status
+
+# Generar reporte para Harvest
+harvest report
+
+# Actualizar a la última versión
+harvest upgrade
+```
+
+## 🛠️ Comandos Disponibles
+
+### Gestión de Tareas
+- `harvest add <descripción> <horas>` - Agregar nueva tarea
+- `harvest tech <descripción> <horas>` - Agregar tarea técnica
+- `harvest meeting <descripción> <horas>` - Agregar reunión
+- `harvest qa <descripción> <horas>` - Agregar tarea de QA
+- `harvest daily` - Agregar daily standup (automático)
+
+### Información y Reportes
+- `harvest status` - Ver estado actual de tareas
+- `harvest report` - Generar reporte para Harvest
+
+### Sistema
+- `harvest upgrade` - Actualizar a la última versión
+- `harvest rollback` - Gestionar rollbacks
+
+## ⚙️ Configuración
+
+El CLI se configura automáticamente en `~/.harvest/`:
+
+- `config.json` - Configuración general
+- `tasks.json` - Datos de tareas
+
+### Configuración de Daily Standup
+
+```bash
+# Configurar horas del daily (por defecto: 0.25h)
+# Se puede modificar en ~/.harvest/config.json
+```
+
+## 🔄 Actualizaciones
+
+El sistema incluye un sistema de upgrade automático:
+
+```bash
+# Verificar actualizaciones
+harvest upgrade
+
+# El sistema:
+# 1. Detecta la versión actual
+# 2. Crea backup automático
+# 3. Descarga nueva versión
+# 4. Instala y migra datos
+# 5. Proporciona rollback automático
+```
+
+## 🛡️ Seguridad
+
+- **Backup automático** antes de cualquier cambio
+- **Verificación de integridad** en cada paso
+- **Rollback automático** en caso de fallo
+- **Logs detallados** para auditoría
+
+## 🖥️ Plataformas Soportadas
+
+- **Linux**: amd64, arm64
+- **macOS**: amd64, arm64
+- **Windows**: amd64
+
+## 🗑️ Desinstalación
+
+```bash
+# Desinstalación automática
+./uninstall.sh
+
+# O manualmente
+make uninstall-script
+```
+
+## 🐛 Solución de Problemas
+
+### El comando `harvest` no funciona
+
+```bash
+# Verificar instalación
+make check
+
+# Si está instalado pero no en PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# O agregar permanentemente a tu shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Problemas de permisos
+
+```bash
+# Hacer ejecutable
+chmod +x ~/.local/bin/harvest
+```
+
+### Verificar instalación
+
+```bash
+# Verificar que funciona
+harvest --version
+harvest --help
+```
+
+## 🔧 Desarrollo
+
+### Compilar desde código fuente
+
+```bash
+# Clonar repositorio
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker/harvest-go
 
 # Instalar dependencias
-pip3 install --user pyperclip
+go mod tidy
+
+# Compilar
+go build -o harvest ./cmd/harvest
+
+# Ejecutar
+./harvest --help
 ```
 
-### Desinstalación
+### Comandos de desarrollo
 
 ```bash
-./uninstall.sh
+# Compilar
+make build
+
+# Compilar para todas las plataformas
+make build-all
+
+# Ejecutar tests
+make test
+
+# Verificar código
+make code-check
+
+# Modo desarrollo
+make dev
 ```
 
-### Actualización
+## 📁 Estructura del Proyecto
 
-```bash
-harvest --upgrade
+```
+harvest-go/
+├── cmd/harvest/          # Punto de entrada
+├── internal/
+│   ├── cli/             # Comandos CLI
+│   ├── core/            # Lógica principal
+│   └── upgrade/         # Sistema de upgrade
+├── pkg/harvest/         # Tipos y utilidades
+├── install.sh           # Script de instalación
+├── uninstall.sh         # Script de desinstalación
+└── Makefile             # Comandos de build
 ```
 
-El sistema de actualización:
-- ✅ Verifica automáticamente si hay nuevas versiones disponibles
-- ✅ Descarga la última versión desde GitHub
-- ✅ Crea un backup automático de tus datos
-- ✅ Instala la nueva versión sin perder configuración
-- ✅ Restaura automáticamente tus datos después de la actualización
-- ✅ Preserva toda tu configuración y tareas existentes
+## 🤝 Contribuir
 
-## 📋 Comandos Principales
-
-### `harvest` - Comando Principal
-```bash
-# Agregar tareas por categoría
-harvest daily                    # Daily standup (0.25h)
-harvest tech "Fix bug" 2.0       # Tarea técnica
-harvest meeting "Sync" 1.0       # Reunión
-harvest qa "Testing" 1.5         # QA/Testing
-harvest add "Task" 1.0 doc       # Tarea genérica con categoría
-
-# Ver estado y reportes
-harvest status                   # Estado actual del día
-harvest report                   # Generar reporte para Harvest
-harvest --upgrade                # Actualizar a la última versión
-```
-
-### `finish` - Completar el Día
-```bash
-finish                     # Modo interactivo
-finish 2.0                 # Agregar tarea de 2h automáticamente
-finish 1.5 "Final task"    # Agregar tarea específica
-```
-
-### `week` - Reportes Semanales
-```bash
-week                       # Mostrar reporte semanal
-week copy                  # Copiar reporte al portapapeles
-```
-
-## 🎯 Flujo de Trabajo Diario
-
-### 1. Inicio del día
-```bash
-harvest daily                    # Agregar daily standup
-```
-
-### 2. Durante el día
-```bash
-harvest tech "Development" 2.5   # Agregar tareas mientras trabajas
-harvest meeting "Planning" 1.0   # Reuniones
-harvest qa "Testing" 1.0         # Testing
-harvest status                   # Verificar progreso
-```
-
-### 3. Final del día
-```bash
-finish                     # Completar horas restantes
-harvest report                   # Generar reporte para Harvest
-```
-
-## 📊 Categorías Disponibles
-
-- **`tech`** 💻 - Desarrollo, debugging, code review
-- **`meeting`** 🤝 - Reuniones, planning, syncs
-- **`qa`** 🧪 - Testing, bug fixes, validation
-- **`doc`** 📚 - Documentación, research
-- **`planning`** 📋 - Sprint planning, roadmap
-- **`research`** 🔍 - Investigación, POCs
-- **`review`** 👀 - Code review, PRs
-- **`deploy`** 🚀 - Deployment, releases
-- **`daily`** 📢 - Daily standup (0.25h automático)
-
-## 💡 Características
-
-- ✅ **Comandos secuenciales** - No más modo interactivo molesto
-- ✅ **Categorías con iconos** - Fácil identificación visual
-- ✅ **Barra de progreso** - Estado visual del día
-- ✅ **Sugerencias inteligentes** - Basadas en horas restantes
-- ✅ **Copia automática** - Reportes listos para Harvest
-- ✅ **Completado inteligente** - `finish` para completar el día
-
-## 📈 Ejemplo de Uso
-
-```bash
-# Día típico
-harvest daily
-harvest tech "Feature development" 3.0
-harvest meeting "Team sync" 1.0
-harvest status
-harvest qa "Bug fixes" 1.5
-finish 2.5 "Documentation"
-harvest report
-```
-
-## 🔧 Configuración
-
-La configuración se almacena en `~/.harvest/config.json`:
-
-```json
-{
-    "daily_hours_target": 8.0,
-    "daily_standup_hours": 0.25,
-    "data_file": "~/.harvest/tasks.json",
-    "user_name": "tu_usuario",
-    "company": "",
-    "timezone": "UTC"
-}
-```
-
-- **Objetivo diario**: Configurable (por defecto 8 horas)
-- **Daily standup**: Configurable (por defecto 0.25h)
-- **Archivo de datos**: `~/.harvest/tasks.json`
-- **Copia automática**: Requiere `pyperclip` (instalado automáticamente)
-
-## 📱 Integración con Harvest
-
-1. Ejecuta `harvest report` o `week copy`
-2. Se copia automáticamente al portapapeles
-3. Pega directamente en Harvest
-
-Formato generado:
-```
-Daily Standup - 0.25h
-Feature development - 3.0h
-Team sync - 1.0h
-Bug fixes - 1.5h
-Documentation - 2.5h
-
-Total: 8.25h
-```
-
-## 🎉 ¡Listo para usar!
-
-El sistema está diseñado para ser simple, rápido y efectivo. Sin complicaciones, solo comandos directos que funcionan.
-
-## 📦 Versionado y Releases
-
-Este proyecto sigue [Semantic Versioning](https://semver.org/). Para crear un nuevo release:
-
-```bash
-# Release de parche (1.0.0 -> 1.0.1)
-./release.sh patch
-
-# Release menor (1.0.0 -> 1.1.0)
-./release.sh minor
-
-# Release mayor (1.0.0 -> 2.0.0)
-./release.sh major
-```
-
-### Estructura de Versionado
-
-- **MAJOR**: Cambios incompatibles con versiones anteriores
-- **MINOR**: Nuevas funcionalidades compatibles hacia atrás
-- **PATCH**: Correcciones de bugs compatibles hacia atrás
-
-### Archivos de Versionado
-
-- `VERSION` - Versión actual del proyecto
-- `CHANGELOG.md` - Historial de cambios
-- `release.sh` - Script para automatizar releases
-
-### Git Tags
-
-Cada release se etiqueta automáticamente:
-```bash
-git tag -l                    # Ver todos los tags
-git show v1.0.0              # Ver detalles del release
-```
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crea un Pull Request
 
 ## 📄 Licencia
 
-MIT License - Ver [LICENSE](LICENSE) para más detalles. 
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 🆘 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
+2. Abre un issue en GitHub
+3. Contacta al equipo de desarrollo
+
+---
+
+**¡Disfruta usando Harvest CLI! 🌾** 
