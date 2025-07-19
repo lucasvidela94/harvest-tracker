@@ -97,8 +97,12 @@ CHANGELOG_ENTRY="## [$NEW_VERSION] - $TODAY
 
 "
 
+# Crear archivo temporal con la nueva entrada
+echo "$CHANGELOG_ENTRY" > temp_changelog_entry.txt
+
 # Insertar nueva entrada al inicio del CHANGELOG (después del header)
-sed -i "/^# Changelog$/a\\$CHANGELOG_ENTRY" CHANGELOG.md
+sed -i "/^# Changelog$/r temp_changelog_entry.txt" CHANGELOG.md
+rm temp_changelog_entry.txt
 log "CHANGELOG actualizado"
 
 # Commit de los cambios
