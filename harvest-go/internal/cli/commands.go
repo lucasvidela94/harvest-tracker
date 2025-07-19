@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -61,6 +62,15 @@ Use "harvest [command] --help" for more information about a command.
 
 	// Comando status
 	rootCmd.AddCommand(statusCmd)
+
+	// Comandos específicos
+	rootCmd.AddCommand(techCmd)
+	rootCmd.AddCommand(meetingCmd)
+	rootCmd.AddCommand(qaCmd)
+	rootCmd.AddCommand(dailyCmd)
+
+	// Comando report
+	rootCmd.AddCommand(reportCmd)
 }
 
 var versionCmd = &cobra.Command{
@@ -245,4 +255,202 @@ func showDetailedStatus(taskManager *core.TaskManager) {
 		}
 	}
 	fmt.Printf("] %.1f%%\n", percentage)
+}
+
+// techCmd es el comando para agregar tareas técnicas
+var techCmd = &cobra.Command{
+	Use:   "tech [description] [hours]",
+	Short: "Add a technical task",
+	Long: `Add a technical task (development, coding, etc.).
+
+Examples:
+  harvest tech "Fix bug" 2.0
+  harvest tech "Development" 3.5`,
+	Args: cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		description := args[0]
+		hoursStr := args[1]
+
+		// Validar horas
+		hours, err := parseHours(hoursStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid hours: %s", hoursStr))
+			return
+		}
+
+		// Agregar tarea técnica
+		taskManager := core.NewTaskManager()
+		if err := taskManager.AddTask(description, hours, "tech"); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Added tech task: %s (%.1fh)", description, hours))
+		showStatus(taskManager)
+	},
+}
+
+// meetingCmd es el comando para agregar reuniones
+var meetingCmd = &cobra.Command{
+	Use:   "meeting [description] [hours]",
+	Short: "Add a meeting task",
+	Long: `Add a meeting task (team sync, planning, etc.).
+
+Examples:
+  harvest meeting "Team sync" 1.0
+  harvest meeting "Planning" 2.0`,
+	Args: cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		description := args[0]
+		hoursStr := args[1]
+
+		// Validar horas
+		hours, err := parseHours(hoursStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid hours: %s", hoursStr))
+			return
+		}
+
+		// Agregar tarea de reunión
+		taskManager := core.NewTaskManager()
+		if err := taskManager.AddTask(description, hours, "meeting"); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Added meeting: %s (%.1fh)", description, hours))
+		showStatus(taskManager)
+	},
+}
+
+// qaCmd es el comando para agregar tareas de QA
+var qaCmd = &cobra.Command{
+	Use:   "qa [description] [hours]",
+	Short: "Add a QA/testing task",
+	Long: `Add a QA/testing task (testing, quality assurance, etc.).
+
+Examples:
+  harvest qa "Testing" 1.5
+  harvest qa "Bug fixes" 2.0`,
+	Args: cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		description := args[0]
+		hoursStr := args[1]
+
+		// Validar horas
+		hours, err := parseHours(hoursStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid hours: %s", hoursStr))
+			return
+		}
+
+		// Agregar tarea de QA
+		taskManager := core.NewTaskManager()
+		if err := taskManager.AddTask(description, hours, "qa"); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Added QA task: %s (%.1fh)", description, hours))
+		showStatus(taskManager)
+	},
+}
+
+// dailyCmd es el comando para agregar daily standup
+var dailyCmd = &cobra.Command{
+	Use:   "daily",
+	Short: "Add daily standup",
+	Long: `Add daily standup task (automatically 0.25h).
+
+This command automatically adds a daily standup task with the default
+duration configured in your settings.`,
+	Args: cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Obtener duración del daily desde configuración
+		taskManager := core.NewTaskManager()
+		dailyHours := taskManager.GetDailyStandupHours()
+
+		// Agregar tarea de daily
+		if err := taskManager.AddTask("Daily Standup", dailyHours, "daily"); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Added daily standup (%.2fh)", dailyHours))
+		showStatus(taskManager)
+	},
+}
+
+// reportCmd es el comando para generar reportes
+var reportCmd = &cobra.Command{
+	Use:   "report",
+	Short: "Generate report for Harvest",
+	Long: `Generate a formatted report for Harvest.
+
+The report shows all today's tasks in the format:
+"Description - X.Xh"
+
+This format is ready to copy and paste into Harvest.`,
+	Args: cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		taskManager := core.NewTaskManager()
+		generateReport(taskManager)
+	},
+}
+
+// generateReport genera el reporte para Harvest
+func generateReport(taskManager *core.TaskManager) {
+	todayTasks, err := taskManager.GetTodayTasks()
+	if err != nil {
+		printError(err)
+		return
+	}
+
+	if len(todayTasks) == 0 {
+		printInfo("No tasks for today")
+		return
+	}
+
+	totalHours := taskManager.GetTotalHours(todayTasks)
+
+	fmt.Printf("📋 Harvest Report for %s\n", time.Now().Format("2006-01-02"))
+	fmt.Printf("Total hours: %.2fh\n\n", totalHours)
+
+	fmt.Println("Copy the following lines to Harvest:")
+	fmt.Println(strings.Repeat("─", 50))
+
+	for _, task := range todayTasks {
+		fmt.Printf("%s - %.1fh\n", task.Description, task.Hours)
+	}
+
+	fmt.Println(strings.Repeat("─", 50))
+
+	// Intentar copiar al portapapeles (opcional)
+	if err := copyToClipboard(todayTasks); err != nil {
+		printInfo("Note: Could not copy to clipboard automatically")
+	} else {
+		printSuccess("Report copied to clipboard!")
+	}
+}
+
+// copyToClipboard intenta copiar el reporte al portapapeles
+func copyToClipboard(tasks []harvest.Task) error {
+	// Construir el texto del reporte
+	var reportText strings.Builder
+	for _, task := range tasks {
+		reportText.WriteString(fmt.Sprintf("%s - %.1fh\n", task.Description, task.Hours))
+	}
+
+	// Intentar usar xclip en Linux
+	cmd := exec.Command("xclip", "-selection", "clipboard")
+	cmd.Stdin = strings.NewReader(reportText.String())
+
+	if err := cmd.Run(); err != nil {
+		// Si xclip falla, intentar con xsel
+		cmd = exec.Command("xsel", "--input", "--clipboard")
+		cmd.Stdin = strings.NewReader(reportText.String())
+		return cmd.Run()
+	}
+
+	return nil
 }
