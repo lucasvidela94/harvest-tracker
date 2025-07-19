@@ -1,137 +1,217 @@
-# 🌾 Harvest CLI (Go Version)
+# 🌾 Harvest CLI
 
-Sistema de tracking de tareas para Harvest, reescrito en Go para mejor performance y distribución.
+Una herramienta de línea de comandos para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
 
-## 🚀 Características
+## 🚀 Instalación Rápida
 
-- ✅ **Binario standalone** - Sin dependencias externas
-- ✅ **Cross-platform** - Linux, macOS, Windows
-- ✅ **Performance** - Ejecución rápida
-- ✅ **Compatibilidad** - Usa los mismos archivos de datos que la versión Python
-- ✅ **Migración gradual** - Puede coexistir con la versión Python
-
-## 📦 Instalación
-
-### Desarrollo Local
+### Opción 1: Instalación Automática (Recomendada)
 
 ```bash
 # Clonar el repositorio
 git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker
+cd harvest-tracker/harvest-go
 
-# Construir el binario
-make build
-
-# Ejecutar
-./harvest
+# Instalar usando el script automático
+./install.sh
 ```
 
-### Build para Múltiples Plataformas
+### Opción 2: Instalación Manual
 
 ```bash
-# Construir para todas las plataformas
-make build-all
+# Compilar e instalar
+make install-script
 
-# Los binarios se crean en build/
-# - harvest-linux-amd64
-# - harvest-linux-arm64
-# - harvest-darwin-amd64
-# - harvest-darwin-arm64
-# - harvest-windows-amd64.exe
+# O manualmente
+make build
+make install
 ```
 
-## 🏗️ Estructura del Proyecto
+### Opción 3: Desde el código fuente
 
-```
-harvest-go/
-├── cmd/
-│   └── harvest/
-│       └── main.go          # Punto de entrada
-├── internal/
-│   ├── core/
-│   │   └── config.go        # Gestión de configuración
-│   ├── cli/
-│   │   └── commands.go      # Comandos CLI con Cobra
-│   └── upgrade/             # Sistema de actualización (pendiente)
-├── pkg/
-│   └── harvest/
-│       └── types.go         # Tipos de datos
-├── Makefile                 # Comandos de build
-├── go.mod                   # Dependencias
-└── README.md
+```bash
+# Clonar y compilar
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker/harvest-go
+go build -o harvest ./cmd/harvest
+
+# Mover a PATH
+sudo mv harvest /usr/local/bin/
 ```
 
-## 🎯 Estado Actual
+## 📋 Uso
 
-### ✅ Implementado
-- [x] Estructura básica del proyecto
-- [x] Framework CLI con Cobra
-- [x] Gestión de configuración
-- [x] Tipos de datos
-- [x] Build multi-plataforma
-- [x] Comando de versión
+Una vez instalado, puedes usar `harvest` desde cualquier lugar:
 
-### 🚧 En Desarrollo
-- [ ] Gestión de tareas (TaskManager)
-- [ ] Comandos add/tech/meeting/qa
-- [ ] Comando status
-- [ ] Comando report
-- [ ] Sistema de upgrade
+```bash
+# Ver ayuda
+harvest --help
 
-### 📋 Pendiente
-- [ ] Tests unitarios
-- [ ] Documentación completa
-- [ ] Script de instalación
-- [ ] CI/CD pipeline
+# Agregar una tarea
+harvest add "Desarrollar nueva funcionalidad" 4.0
+
+# Ver estado actual
+harvest status
+
+# Generar reporte para Harvest
+harvest report
+
+# Actualizar a la última versión
+harvest upgrade
+```
+
+## 🛠️ Comandos Disponibles
+
+### Gestión de Tareas
+- `harvest add <descripción> <horas>` - Agregar nueva tarea
+- `harvest tech <descripción> <horas>` - Agregar tarea técnica
+- `harvest meeting <descripción> <horas>` - Agregar reunión
+- `harvest qa <descripción> <horas>` - Agregar tarea de QA
+- `harvest daily` - Agregar daily standup (automático)
+
+### Información y Reportes
+- `harvest status` - Ver estado actual de tareas
+- `harvest report` - Generar reporte para Harvest
+
+### Sistema
+- `harvest upgrade` - Actualizar a la última versión
+- `harvest rollback` - Gestionar rollbacks
+
+## ⚙️ Configuración
+
+El CLI se configura automáticamente en `~/.harvest/`:
+
+- `config.json` - Configuración general
+- `tasks.json` - Datos de tareas
+
+### Configuración de Daily Standup
+
+```bash
+# Configurar horas del daily (por defecto: 0.25h)
+# Se puede modificar en ~/.harvest/config.json
+```
+
+## 🔄 Actualizaciones
+
+El sistema incluye un sistema de upgrade automático:
+
+```bash
+# Verificar actualizaciones
+harvest upgrade
+
+# El sistema:
+# 1. Detecta la versión actual
+# 2. Crea backup automático
+# 3. Descarga nueva versión
+# 4. Instala y migra datos
+# 5. Proporciona rollback automático
+```
+
+## 🛡️ Seguridad
+
+- **Backup automático** antes de cualquier cambio
+- **Verificación de integridad** en cada paso
+- **Rollback automático** en caso de fallo
+- **Logs detallados** para auditoría
+
+## 🖥️ Plataformas Soportadas
+
+- **Linux**: amd64, arm64
+- **macOS**: amd64, arm64
+- **Windows**: amd64
+
+## 🗑️ Desinstalación
+
+```bash
+# Desinstalación automática
+./uninstall.sh
+
+# O manualmente
+make uninstall-script
+```
+
+## 🐛 Solución de Problemas
+
+### El comando `harvest` no funciona
+
+```bash
+# Verificar instalación
+make check
+
+# Si está instalado pero no en PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# O agregar permanentemente a tu shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Problemas de permisos
+
+```bash
+# Hacer ejecutable
+chmod +x ~/.local/bin/harvest
+```
+
+### Verificar instalación
+
+```bash
+# Verificar que funciona
+harvest --version
+harvest --help
+```
 
 ## 🔧 Desarrollo
 
-### Comandos Make
+### Compilar desde código fuente
 
 ```bash
-make build      # Construir binario
-make clean      # Limpiar archivos
-make test       # Ejecutar tests
-make deps       # Instalar dependencias
-make build-all  # Build multi-plataforma
-make run        # Construir y ejecutar
-make check      # Verificar código
-make help       # Mostrar ayuda
+# Clonar repositorio
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker/harvest-go
+
+# Instalar dependencias
+go mod tidy
+
+# Compilar
+go build -o harvest ./cmd/harvest
+
+# Ejecutar
+./harvest --help
 ```
 
-### Dependencias
+### Comandos de desarrollo
 
-```go
-require (
-    github.com/spf13/cobra v1.9.1  // CLI framework
-)
+```bash
+# Compilar
+make build
+
+# Compilar para todas las plataformas
+make build-all
+
+# Ejecutar tests
+make test
+
+# Verificar código
+make code-check
+
+# Modo desarrollo
+make dev
 ```
 
-## 🔄 Migración desde Python
+## 📁 Estructura del Proyecto
 
-### Estrategia de Migración Gradual
-
-1. **Fase 1**: Estructura básica ✅
-2. **Fase 2**: Comandos core (add, status, report)
-3. **Fase 3**: Sistema de upgrade
-4. **Fase 4**: Tests y documentación
-5. **Fase 5**: Distribución y CI/CD
-
-### Compatibilidad de Datos
-
-- Usa los mismos archivos de configuración (`~/.harvest/config.json`)
-- Usa los mismos archivos de datos (`~/.harvest/tasks.json`)
-- Puede coexistir con la versión Python durante la migración
-
-## 🎯 Ventajas sobre Python
-
-| Aspecto | Python | Go |
-|---------|--------|----|
-| **Dependencias** | Python 3.x + librerías | Solo binario |
-| **Distribución** | Script + archivos | Un archivo |
-| **Performance** | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Instalación** | Compleja | Simple |
-| **Cross-platform** | Depende de Python | Nativo |
+```
+harvest-go/
+├── cmd/harvest/          # Punto de entrada
+├── internal/
+│   ├── cli/             # Comandos CLI
+│   ├── core/            # Lógica principal
+│   └── upgrade/         # Sistema de upgrade
+├── pkg/harvest/         # Tipos y utilidades
+├── install.sh           # Script de instalación
+├── uninstall.sh         # Script de desinstalación
+└── Makefile             # Comandos de build
+```
 
 ## 🤝 Contribuir
 
@@ -143,8 +223,16 @@ require (
 
 ## 📄 Licencia
 
-MIT License - ver [LICENSE](LICENSE) para detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 🆘 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
+2. Abre un issue en GitHub
+3. Contacta al equipo de desarrollo
 
 ---
 
-**Nota**: Esta es la versión Go de Harvest CLI. La versión Python original sigue funcionando y se puede encontrar en el directorio `scripts/harvest/`. 
+**¡Disfruta usando Harvest CLI! 🌾** 

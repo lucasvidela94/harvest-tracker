@@ -42,16 +42,30 @@ func (vm *VersionManager) DetectPythonInstallation() (bool, string, error) {
 
 	// Verificar que es el script de Python (no el binario de Go)
 	if strings.Contains(pythonPath, "scripts/harvest") || strings.HasSuffix(pythonPath, "harvest") {
-		// Intentar ejecutar para obtener versión
-		cmd := exec.Command(pythonPath, "--version")
-		output, err := cmd.Output()
+		// Verificar si es un script Python (no un binario)
+		info, err := os.Stat(pythonPath)
 		if err != nil {
-			return false, "", fmt.Errorf("could not get Python version: %v", err)
+			return false, "", nil
 		}
 
-		// Extraer versión del output
-		version := strings.TrimSpace(string(output))
-		return true, version, nil
+		// Si es un archivo regular (no un binario ejecutable), probablemente es Python
+		if info.Mode().IsRegular() && (info.Mode()&0111) == 0 {
+			// Intentar ejecutar para obtener versión
+			cmd := exec.Command("python3", pythonPath, "--version")
+			output, err := cmd.Output()
+			if err != nil {
+				// Si falla, intentar con python
+				cmd = exec.Command("python", pythonPath, "--version")
+				output, err = cmd.Output()
+				if err != nil {
+					return false, "", nil // No se puede ejecutar, asumir que no es Python válido
+				}
+			}
+
+			// Extraer versión del output
+			version := strings.TrimSpace(string(output))
+			return true, version, nil
+		}
 	}
 
 	return false, "", nil
