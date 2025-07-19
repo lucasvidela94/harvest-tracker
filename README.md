@@ -1,8 +1,8 @@
 # 🌾 Harvest CLI
 
-Una herramienta de línea de comandos para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
+Una herramienta de línea de comandos moderna y eficiente para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
 
-> **Nota**: Este proyecto ha sido migrado completamente a Go para mejor rendimiento y mantenibilidad.
+> **✨ Proyecto completamente migrado a Go** - Mejor rendimiento, mantenibilidad y distribución multiplataforma.
 
 ## 🚀 Instalación Rápida
 
@@ -171,19 +171,18 @@ make dev
 
 ```
 harvest/
-├── cmd/harvest/          # Punto de entrada
-├── internal/             # Lógica interna
+├── cmd/harvest/          # Punto de entrada principal
+├── internal/             # Lógica interna del proyecto
 │   ├── cli/             # Comandos CLI
 │   ├── core/            # Lógica principal
 │   └── upgrade/         # Sistema de upgrade
 ├── pkg/harvest/         # Tipos y utilidades
-├── build/               # Archivos de build
+├── build/               # Archivos de build para múltiples plataformas
 ├── releases/            # Releases compilados
-├── harvest-python-backup/ # Backup del código Python anterior
 ├── install.sh           # Script de instalación
 ├── uninstall.sh         # Script de desinstalación
 ├── release.sh           # Script de release
-├── Makefile             # Comandos de build
+├── Makefile             # Comandos de build y desarrollo
 ├── go.mod               # Dependencias Go
 ├── go.sum               # Checksums de dependencias
 ├── README.md            # Este archivo
@@ -192,6 +191,15 @@ harvest/
 ├── VERSION              # Versión actual
 └── harvest              # Ejecutable compilado
 ```
+
+## 🎯 Características Principales
+
+- **⚡ Alto Rendimiento**: Escrito en Go para máxima velocidad
+- **🔧 Fácil Instalación**: Scripts automáticos de instalación
+- **🔄 Actualizaciones Automáticas**: Sistema de upgrade integrado
+- **🛡️ Seguridad**: Backup y rollback automáticos
+- **📱 Multiplataforma**: Soporte para Linux, macOS y Windows
+- **📊 Reportes Inteligentes**: Generación automática de reportes para Harvest
 
 ## 🤝 Contribuir
 
@@ -212,6 +220,14 @@ Si tienes problemas o preguntas:
 1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
 2. Abre un issue en GitHub
 3. Contacta al equipo de desarrollo
+
+## 📈 Roadmap
+
+- [ ] Integración directa con API de Harvest
+- [ ] Interfaz web para gestión de tareas
+- [ ] Sincronización en tiempo real
+- [ ] Reportes avanzados y analytics
+- [ ] Integración con otros sistemas de gestión de tiempo
 
 ---
 
