@@ -552,10 +552,15 @@ func performUpgrade() {
 
 	fmt.Printf("Download URL: %s\n", downloadURL)
 
-	// Por ahora, solo mostrar información de descarga
-	fmt.Println("\n🚧 Download system is under development")
+	// Instalar nueva versión
+	fmt.Println("\n🔧 Installing new version...")
+	installManager := upgrade.NewInstallManager()
+
+	// Por ahora, solo mostrar información de instalación
+	fmt.Println("\n🚧 Installation system is under development")
 	fmt.Println("This feature will be available in the next release.")
-	fmt.Println("For now, you can manually download the latest version from:")
+	fmt.Println("For now, you can manually download and install from:")
 	fmt.Printf("https://github.com/%s/%s/releases\n", upgrade.RepoOwner, upgrade.RepoName)
 	fmt.Printf("\nYour data has been safely backed up to: %s\n", backupPath)
+	fmt.Printf("Installation path: %s\n", installManager.GetInstallPath())
 }
