@@ -1,4 +1,23 @@
 # Changelog
+## [1.0.1] - 2025-07-21
+
+### Added
+- **Enhanced Documentation**: README completamente actualizado con funcionalidades enterprise
+- **Comprehensive Help**: Help extensivo con todos los comandos y ejemplos
+- **Enterprise Features Section**: Documentación detallada de características profesionales
+- **Advanced Usage Examples**: Ejemplos prácticos para flujos de trabajo diarios
+
+### Improved
+- **Help System**: Help completo con 18 comandos documentados
+- **README Structure**: Sección enterprise con características avanzadas
+- **Installation Guide**: Documentación mejorada de instalación automática
+- **Usage Examples**: Ejemplos detallados de gestión de tareas
+
+### Features
+- **Enterprise Documentation**: Documentación profesional lista para empresas
+- **Complete Command Reference**: Todos los comandos con descripciones detalladas
+- **Professional Examples**: Ejemplos de uso en flujos de trabajo reales
+
 ## [1.0.0] - 2025-07-21
 
 ### Added

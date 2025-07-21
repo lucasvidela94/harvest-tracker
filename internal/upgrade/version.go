@@ -17,7 +17,7 @@ const (
 	// RepoName es el nombre del repositorio
 	RepoName = "harvest-tracker"
 	// CurrentVersion es la versión actual de Go
-	CurrentVersion = "1.0.0"
+	CurrentVersion = "1.0.1"
 )
 
 // VersionManager maneja la detección y comparación de versiones
