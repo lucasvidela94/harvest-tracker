@@ -142,20 +142,28 @@ check_exit "harvest complete bug"
 # Test 4: Reportes y exportación
 print_info "Test 4: Reportes y exportación"
 
+# Obtener fecha actual para los reportes
+CURRENT_DATE=$(date +%Y-%m-%d)
+print_info "Usando fecha actual: $CURRENT_DATE"
+
+# Verificar que las tareas se crearon correctamente
+print_info "Verificando tareas creadas..."
+harvest list
+
 # Reporte del día (sin filtros de fecha)
-harvest report --date 2025-07-21
+harvest report --date "$CURRENT_DATE"
 check_exit "harvest report"
 
 # Reporte para Harvest
-harvest report --harvest --date 2025-07-21
+harvest report --harvest --date "$CURRENT_DATE"
 check_exit "harvest report --harvest"
 
 # Exportar a CSV
-harvest export --format csv --output dia-completo.csv --date 2025-07-21
+harvest export --format csv --output dia-completo.csv --date "$CURRENT_DATE"
 check_exit "harvest export csv"
 
 # Exportar a JSON
-harvest export --format json --output dia-completo.json --date 2025-07-21
+harvest export --format json --output dia-completo.json --date "$CURRENT_DATE"
 check_exit "harvest export json"
 
 # Test 5: Búsqueda y filtros
@@ -193,13 +201,13 @@ check_exit "harvest qa"
 
 # Test 8: Reportes avanzados
 print_info "Test 8: Reportes avanzados"
-harvest report --week --date 2025-07-21
+harvest report --week
 check_exit "harvest report --week"
 
-harvest report --category tech --date 2025-07-21
+harvest report --category tech
 check_exit "harvest report --category"
 
-harvest report --status pending --date 2025-07-21
+harvest report --status pending
 check_exit "harvest report --status"
 
 # Test 9: Verificar archivos generados
@@ -238,7 +246,8 @@ fi
 
 # Test 11: Verificar tareas de mañana
 print_info "Test 11: Verificar tareas de mañana"
-harvest list --date 2025-07-22
+TOMORROW_DATE=$(date -d "tomorrow" +%Y-%m-%d)
+harvest list --date "$TOMORROW_DATE"
 check_exit "harvest list --date tomorrow"
 
 # Test 12: Estado final
