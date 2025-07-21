@@ -38,16 +38,18 @@ esac
 
 # Determinar extensión del archivo
 if [ "$OS" = "darwin" ]; then
-    EXT="tar.gz"
+    EXT=""
 elif [ "$OS" = "linux" ]; then
-    EXT="tar.gz"
+    EXT=""
+elif [ "$OS" = "windows" ]; then
+    EXT=".exe"
 else
     echo -e "${RED}❌ Sistema operativo no soportado: $OS${NC}"
     exit 1
 fi
 
-# URL del release
-RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$LATEST_VERSION-$OS-$ARCH.$EXT"
+# URL del release (binario individual)
+RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$OS-$ARCH$EXT"
 
 echo -e "${BLUE}📦 Descargando desde: $RELEASE_URL${NC}"
 
@@ -57,23 +59,20 @@ cd "$TEMP_DIR"
 
 # Descargar release
 echo -e "${YELLOW}⬇️  Descargando...${NC}"
-curl -L -o "workflow.$EXT" "$RELEASE_URL"
+curl -L -o "workflow" "$RELEASE_URL"
 
-# Verificar checksum (opcional)
-echo -e "${YELLOW}🔐 Verificando integridad...${NC}"
-curl -L -o "checksums.txt" "https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$LATEST_VERSION-checksums.txt"
-if command -v sha256sum >/dev/null 2>&1; then
-    sha256sum -c checksums.txt --ignore-missing || echo -e "${YELLOW}⚠️  Advertencia: No se pudo verificar checksum${NC}"
+# Verificar que el archivo se descargó correctamente
+if [ ! -f "workflow" ] || [ ! -s "workflow" ]; then
+    echo -e "${RED}❌ Error: No se pudo descargar el archivo${NC}"
+    exit 1
 fi
 
-# Extraer
-echo -e "${YELLOW}📁 Extrayendo...${NC}"
-tar -xzf "workflow.$EXT"
+# Hacer ejecutable
+chmod +x workflow
 
 # Instalar
 echo -e "${YELLOW}🔧 Instalando...${NC}"
-sudo mv "workflow-$LATEST_VERSION-$OS-$ARCH/workflow" /usr/local/bin/workflow
-sudo chmod +x /usr/local/bin/workflow
+sudo mv "workflow" /usr/local/bin/workflow
 
 # Limpiar
 cd /
