@@ -1,4 +1,15 @@
 # Changelog
+## [2.0.1] - 2025-07-21
+
+### Fixed
+- **SQLite Integration**: Fixed `list` and `search` commands to use SQLite instead of JSON
+- **Production Testing**: Improved test reliability and debugging
+- **Release Process**: Cleaned up release generation to avoid "dirty" tags
+
+### Changed
+- **Version**: Bumped to 2.0.1 for stable release
+- **Testing**: Enhanced production test with better verification
+
 ## [2.0.0] - 2025-07-21
 
 ### Added
