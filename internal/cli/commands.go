@@ -1052,7 +1052,8 @@ Examples:
   harvest list --date 2025-07-20
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		date, _ := cmd.Flags().GetString("date")
 		if date == "" {
 			date = time.Now().Format("2006-01-02")
@@ -1291,7 +1292,8 @@ Examples:
 		status, _ := cmd.Flags().GetString("status")
 		date, _ := cmd.Flags().GetString("date")
 
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		tasks, err := taskManager.SearchTasks(query, category, status, date)
 		if err != nil {
 			printError(err)
