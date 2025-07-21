@@ -21,7 +21,7 @@
 ## [1.0.0] - 2025-07-21
 
 ### Added
-- **Enterprise CLI Tool**: Harvest CLI como herramienta enterprise completa
+- **Enterprise CLI Tool**: workflow CLI como herramienta enterprise completa
 - **Auto-Installation**: Instalador automático multiplataforma
 - **Auto-Update**: Sistema de actualización automática
 - **SQLite Integration**: Base de datos robusta con índices optimizados
@@ -29,8 +29,8 @@
 - **Enterprise Features**: Distribución profesional con checksums
 
 ### Features
-- **One-liner Installation**: `curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash`
-- **Auto-Update Commands**: `harvest check-update` y `harvest upgrade`
+- **One-liner Installation**: `curl -fsSL https://raw.githubusercontent.com/lucasvidela94/workflow-cli/main/install-latest.sh | bash`
+- **Auto-Update Commands**: `workflow check-update` y `workflow upgrade`
 - **Complete Task Management**: add, list, search, edit, delete, report
 - **SQLite Database**: Rendimiento optimizado y escalabilidad
 - **Professional Distribution**: Releases con archivos binarios y checksums
@@ -58,7 +58,7 @@
 - **Filtros avanzados**: Por categoría, estado, fecha y texto
 - **Índices de base de datos**: Optimización para búsquedas rápidas
 - **Sistema de backup**: Backup automático antes de migración
-- **Compatibilidad**: Mantiene formato legacy para Harvest app
+- **Compatibilidad**: Mantiene formato legacy para workflow app
 
 ### Changed
 - **Arquitectura**: Migración de JSON a SQLite para mejor rendimiento y escalabilidad
@@ -76,7 +76,7 @@
 ## [1.1.0] - 2025-01-08
 
 ### Added
-- Sistema de actualización automática con `harvest --upgrade`
+- Sistema de actualización automática con `workflow --upgrade`
 - Verificación de versiones desde GitHub releases
 - Backup automático de datos del usuario antes de actualizar
 - Restauración automática de datos después de la actualización
@@ -111,14 +111,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-01-07
 
 ### Added
-- Sistema completo de tracking de tareas para Harvest
-- Comando principal `harvest` con subcomandos: add, status, report, daily, finish
+- Sistema completo de tracking de tareas para workflow
+- Comando principal `workflow` con subcomandos: add, status, report, daily, finish
 - Comando `finish` para completar horas restantes del día
 - Comando `week` para generar reportes semanales
 - Soporte para categorías: technical, meetings, qa, daily
 - Validación de entrada de horas (soporte para lenguaje natural: "two hours", "half", etc.)
-- Configuración centralizada en `~/.harvest/config.json`
-- Almacenamiento de datos en `~/.harvest/tasks.json`
+- Configuración centralizada en `~/.workflow/config.json`
+- Almacenamiento de datos en `~/.workflow/tasks.json`
 - Script de instalación universal que detecta shell (bash/zsh)
 - Script de desinstalación
 - Documentación completa en README.md
@@ -130,6 +130,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuración de alias automática
 - Instalación de dependencias automática
 - Persistencia de datos local
-- Reportes formateados para Harvest
+- Reportes formateados para workflow
 - Barra de progreso visual
 - Soporte para múltiples zonas horarias 

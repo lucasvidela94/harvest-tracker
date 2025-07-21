@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de instalación para Harvest CLI usando binario pre-compilado
+# Script de instalación para workflow CLI usando binario pre-compilado
 # No requiere Go instalado
 
 set -e
@@ -107,7 +107,7 @@ add_to_path() {
             if ! grep -q "$install_dir" "$shell_rc" 2>/dev/null; then
                 print_info "Agregando $install_dir al PATH en $shell_rc"
                 echo "" >> "$shell_rc"
-                echo "# Harvest CLI" >> "$shell_rc"
+                echo "# workflow CLI" >> "$shell_rc"
                 echo "export PATH=\"$install_dir:\$PATH\"" >> "$shell_rc"
                 print_success "PATH actualizado. Ejecuta 'source $shell_rc' o reinicia tu terminal"
             else
@@ -122,7 +122,7 @@ add_to_path() {
 
 # Función principal
 main() {
-    echo "🌾 Harvest CLI - Instalación con Binario Pre-compilado"
+    echo "🌾 workflow CLI - Instalación con Binario Pre-compilado"
     echo "=================================================="
     
     local os=$(detect_os)
@@ -141,9 +141,9 @@ main() {
     case "$os" in
         linux)
             if [[ "$arch" == "amd64" ]]; then
-                binary_file="releases/harvest-v2.0.0-linux-amd64.tar.gz"
+                binary_file="releases/workflow-v2.0.0-linux-amd64.tar.gz"
             elif [[ "$arch" == "arm64" ]]; then
-                binary_file="releases/harvest-v2.0.0-linux-arm64.tar.gz"
+                binary_file="releases/workflow-v2.0.0-linux-arm64.tar.gz"
             else
                 print_error "Arquitectura no soportada: $arch"
                 exit 1
@@ -151,16 +151,16 @@ main() {
             ;;
         darwin)
             if [[ "$arch" == "amd64" ]]; then
-                binary_file="releases/harvest-v2.0.0-darwin-amd64.tar.gz"
+                binary_file="releases/workflow-v2.0.0-darwin-amd64.tar.gz"
             elif [[ "$arch" == "arm64" ]]; then
-                binary_file="releases/harvest-v2.0.0-darwin-arm64.tar.gz"
+                binary_file="releases/workflow-v2.0.0-darwin-arm64.tar.gz"
             else
                 print_error "Arquitectura no soportada: $arch"
                 exit 1
             fi
             ;;
         windows)
-            binary_file="releases/harvest-v2.0.0-windows-amd64.zip"
+            binary_file="releases/workflow-v2.0.0-windows-amd64.zip"
             ;;
         *)
             print_error "Sistema operativo no soportado: $os"
@@ -178,7 +178,7 @@ main() {
     
     # Obtener ruta de instalación
     local install_dir=$(get_install_path)
-    local install_path="$install_dir/harvest"
+    local install_path="$install_dir/workflow"
     
     # Crear directorio de instalación si no existe
     if [[ ! -d "$install_dir" ]]; then
@@ -205,9 +205,9 @@ main() {
         tar -xzf "$binary_file" -C "$temp_dir"
         
         # Mover el binario desde el subdirectorio
-        local extracted_dir=$(find "$temp_dir" -name "harvest-*" -type d | head -1)
-        if [[ -n "$extracted_dir" && -f "$extracted_dir/harvest" ]]; then
-            cp "$extracted_dir/harvest" "$install_path"
+        local extracted_dir=$(find "$temp_dir" -name "workflow-*" -type d | head -1)
+        if [[ -n "$extracted_dir" && -f "$extracted_dir/workflow" ]]; then
+            cp "$extracted_dir/workflow" "$install_path"
             rm -rf "$temp_dir"
         else
             print_error "No se pudo encontrar el binario en el archivo extraído"
@@ -220,7 +220,7 @@ main() {
     
     # Verificar instalación
     if [[ -f "$install_path" ]]; then
-        print_success "Harvest CLI instalado exitosamente!"
+        print_success "workflow CLI instalado exitosamente!"
     else
         print_error "Error en la instalación"
         exit 1
@@ -238,18 +238,18 @@ main() {
     echo ""
     print_success "🎉 Instalación completada!"
     echo ""
-    print_info "Para usar Harvest CLI:"
-    echo "  harvest --help"
+    print_info "Para usar workflow CLI:"
+    echo "  workflow --help"
     echo ""
     print_info "Ejemplos de uso:"
-    echo "  harvest add 'Tarea de ejemplo' 2.0"
-    echo "  harvest status"
-    echo "  harvest report"
-    echo "  harvest upgrade"
+    echo "  workflow add 'Tarea de ejemplo' 2.0"
+    echo "  workflow status"
+    echo "  workflow report"
+    echo "  workflow upgrade"
     echo ""
     
     if [[ "$os" != "windows" ]]; then
-        print_warning "Si 'harvest' no funciona, ejecuta:"
+        print_warning "Si 'workflow' no funciona, ejecuta:"
         echo "  source ~/.bashrc  # o ~/.zshrc"
         echo "  # O reinicia tu terminal"
     fi

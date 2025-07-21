@@ -17,7 +17,7 @@ type BackupManager struct {
 // NewBackupManager crea un nuevo gestor de backup
 func NewBackupManager() *BackupManager {
 	homeDir, _ := os.UserHomeDir()
-	backupDir := filepath.Join(homeDir, ".harvest", "backup")
+	backupDir := filepath.Join(homeDir, ".workflow", "backup")
 
 	return &BackupManager{
 		backupDir: backupDir,
@@ -48,7 +48,7 @@ func (bm *BackupManager) CreateBackup() error {
 
 	// Crear backup de cada archivo
 	for _, filename := range filesToBackup {
-		sourcePath := filepath.Join(bm.homeDir, ".harvest", filename)
+		sourcePath := filepath.Join(bm.homeDir, ".workflow", filename)
 		destPath := filepath.Join(backupPath, filename)
 
 		if err := bm.backupFile(sourcePath, destPath); err != nil {
@@ -115,7 +115,7 @@ func (bm *BackupManager) createBackupMetadata(backupPath, timestamp string) erro
     "tasks.json"
   ],
   "version": "1.0",
-  "created_by": "harvest-cli-go"
+  "created_by": "workflow-cli-go"
 }`, timestamp, backupPath)
 
 	metadataPath := filepath.Join(backupPath, "backup.json")
@@ -139,7 +139,7 @@ func (bm *BackupManager) RestoreBackup() error {
 	// Restaurar cada archivo
 	for _, filename := range filesToRestore {
 		sourcePath := filepath.Join(latestBackup, filename)
-		destPath := filepath.Join(bm.homeDir, ".harvest", filename)
+		destPath := filepath.Join(bm.homeDir, ".workflow", filename)
 
 		if err := bm.restoreFile(sourcePath, destPath); err != nil {
 			return fmt.Errorf("could not restore %s: %v", filename, err)

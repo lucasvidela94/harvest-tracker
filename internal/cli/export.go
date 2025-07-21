@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/internal/core"
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 	"github.com/spf13/cobra"
 )
 
@@ -26,11 +26,11 @@ Supported formats:
 You can specify date ranges and filters to customize the export.
 
 Examples:
-  harvest export --format csv
-  harvest export --format csv --date 2025-07-21
-  harvest export --format csv --week
-  harvest export --format csv --category tech
-  harvest export --format json --status completed
+  workflow export --format csv
+  workflow export --format csv --date 2025-07-21
+  workflow export --format csv --week
+  workflow export --format csv --category tech
+  workflow export --format json --status completed
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		formatFlag, _ := cmd.Flags().GetString("format")
@@ -73,7 +73,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 	taskManager := core.NewTaskManagerSQLite()
 	defer taskManager.Close()
 
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 	var err error
 
 	// Determinar período de exportación
@@ -94,7 +94,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 			return
 		}
 		// Filtrar por semana
-		var weekTasks []harvest.Task
+		var weekTasks []workflow.Task
 		for _, task := range tasks {
 			if task.Date >= startDate && task.Date <= endDate {
 				weekTasks = append(weekTasks, task)
@@ -111,7 +111,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 			return
 		}
 		// Filtrar por mes
-		var monthTasks []harvest.Task
+		var monthTasks []workflow.Task
 		for _, task := range tasks {
 			if task.Date >= startDate && task.Date <= endDate {
 				monthTasks = append(monthTasks, task)
@@ -128,7 +128,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 	}
 
 	// Aplicar filtros adicionales
-	var filteredTasks []harvest.Task
+	var filteredTasks []workflow.Task
 	for _, task := range tasks {
 		if category != "" && task.Category != category {
 			continue
@@ -147,7 +147,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 	// Determinar nombre de archivo
 	if output == "" {
 		timestamp := time.Now().Format("20060102-150405")
-		output = fmt.Sprintf("harvest-export-%s.%s", timestamp, format)
+		output = fmt.Sprintf("workflow-export-%s.%s", timestamp, format)
 	}
 
 	// Exportar según formato
@@ -169,7 +169,7 @@ func performExport(format, date string, week, month bool, category, status, outp
 }
 
 // exportToCSV exporta las tareas a formato CSV
-func exportToCSV(tasks []harvest.Task, filename string) error {
+func exportToCSV(tasks []workflow.Task, filename string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -205,7 +205,7 @@ func exportToCSV(tasks []harvest.Task, filename string) error {
 }
 
 // exportToJSON exporta las tareas a formato JSON
-func exportToJSON(tasks []harvest.Task, filename string) error {
+func exportToJSON(tasks []workflow.Task, filename string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -247,5 +247,5 @@ func init() {
 	exportCmd.Flags().Bool("month", false, "Export monthly tasks")
 	exportCmd.Flags().String("category", "", "Filter by category")
 	exportCmd.Flags().String("status", "", "Filter by status (pending, in_progress, completed, paused)")
-	exportCmd.Flags().String("output", "", "Output filename (default: harvest-export-YYYYMMDD-HHMMSS.format)")
+	exportCmd.Flags().String("output", "", "Output filename (default: workflow-export-YYYYMMDD-HHMMSS.format)")
 }

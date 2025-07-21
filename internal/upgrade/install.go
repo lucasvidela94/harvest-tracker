@@ -20,8 +20,8 @@ type InstallManager struct {
 // NewInstallManager crea un nuevo gestor de instalación
 func NewInstallManager() *InstallManager {
 	homeDir, _ := os.UserHomeDir()
-	installDir := filepath.Join(homeDir, ".harvest", "install")
-	backupDir := filepath.Join(homeDir, ".harvest", "backup")
+	installDir := filepath.Join(homeDir, ".workflow", "install")
+	backupDir := filepath.Join(homeDir, ".workflow", "backup")
 
 	return &InstallManager{
 		installDir: installDir,
@@ -198,7 +198,7 @@ func (im *InstallManager) findBinary(extractPath string) (string, error) {
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() && entry.Name() == "harvest" {
+		if !entry.IsDir() && entry.Name() == "workflow" {
 			return filepath.Join(extractPath, entry.Name()), nil
 		}
 	}
@@ -222,7 +222,7 @@ func (im *InstallManager) findBinaryRecursive(dir string) (string, error) {
 			if found, err := im.findBinaryRecursive(path); err == nil {
 				return found, nil
 			}
-		} else if entry.Name() == "harvest" {
+		} else if entry.Name() == "workflow" {
 			return path, nil
 		}
 	}
@@ -234,7 +234,7 @@ func (im *InstallManager) findBinaryRecursive(dir string) (string, error) {
 func (im *InstallManager) getInstallPath() string {
 	// Para desarrollo, instalar en ~/.local/bin
 	homeDir, _ := os.UserHomeDir()
-	return filepath.Join(homeDir, ".local", "bin", "harvest")
+	return filepath.Join(homeDir, ".local", "bin", "workflow")
 }
 
 // backupCurrentBinary hace backup del binario actual
@@ -244,7 +244,7 @@ func (im *InstallManager) backupCurrentBinary(installPath string) error {
 		return nil
 	}
 
-	backupPath := filepath.Join(im.backupDir, "harvest.bak")
+	backupPath := filepath.Join(im.backupDir, "workflow.bak")
 
 	// Copiar binario actual a backup
 	if err := im.copyBinary(installPath, backupPath); err != nil {
@@ -369,7 +369,7 @@ func (im *InstallManager) GetInstallPath() string {
 // RollbackInstallation revierte la instalación
 func (im *InstallManager) RollbackInstallation() error {
 	installPath := im.getInstallPath()
-	backupPath := filepath.Join(im.backupDir, "harvest.bak")
+	backupPath := filepath.Join(im.backupDir, "workflow.bak")
 
 	// Verificar que existe backup del binario
 	if _, err := os.Stat(backupPath); os.IsNotExist(err) {

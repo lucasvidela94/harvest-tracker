@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 )
 
 // TaskManagerSQLite es una implementación del TaskManager usando SQLite
@@ -25,7 +25,7 @@ func NewTaskManagerSQLite() *TaskManagerSQLite {
 
 	// Obtener directorio de datos
 	homeDir, _ := os.UserHomeDir()
-	dataDir := filepath.Join(homeDir, ".harvest")
+	dataDir := filepath.Join(homeDir, ".workflow")
 
 	dbManager := NewDatabaseManager(dataDir)
 	if err := dbManager.Init(); err != nil {
@@ -39,12 +39,12 @@ func NewTaskManagerSQLite() *TaskManagerSQLite {
 }
 
 // LoadTasks carga las tareas desde la base de datos
-func (tm *TaskManagerSQLite) LoadTasks() ([]harvest.Task, error) {
+func (tm *TaskManagerSQLite) LoadTasks() ([]workflow.Task, error) {
 	return tm.dbManager.LoadTasks()
 }
 
 // SaveTasks guarda las tareas en la base de datos (compatibilidad con interfaz JSON)
-func (tm *TaskManagerSQLite) SaveTasks(tasks []harvest.Task) error {
+func (tm *TaskManagerSQLite) SaveTasks(tasks []workflow.Task) error {
 	// Para SQLite, no necesitamos este método ya que cada tarea se guarda individualmente
 	// Pero lo mantenemos para compatibilidad
 	return nil
@@ -59,12 +59,12 @@ func (tm *TaskManagerSQLite) AddTask(description string, hours float64, category
 	}
 
 	// Crear nueva tarea
-	newTask := &harvest.Task{
+	newTask := &workflow.Task{
 		Description: description,
 		Hours:       hours,
 		Category:    category,
 		Date:        taskDate,
-		Status:      harvest.StatusPending,
+		Status:      workflow.StatusPending,
 		CreatedAt:   time.Now(),
 	}
 
@@ -101,23 +101,23 @@ func (tm *TaskManagerSQLite) DeleteTask(id int) error {
 }
 
 // GetTaskByID obtiene una tarea específica por ID
-func (tm *TaskManagerSQLite) GetTaskByID(id int) (*harvest.Task, error) {
+func (tm *TaskManagerSQLite) GetTaskByID(id int) (*workflow.Task, error) {
 	return tm.dbManager.GetTaskByID(id)
 }
 
 // GetTodayTasks obtiene las tareas del día actual
-func (tm *TaskManagerSQLite) GetTodayTasks() ([]harvest.Task, error) {
+func (tm *TaskManagerSQLite) GetTodayTasks() ([]workflow.Task, error) {
 	today := time.Now().Format("2006-01-02")
 	return tm.dbManager.GetTasksByDate(today)
 }
 
 // GetTasksByDate obtiene las tareas de una fecha específica
-func (tm *TaskManagerSQLite) GetTasksByDate(date string) ([]harvest.Task, error) {
+func (tm *TaskManagerSQLite) GetTasksByDate(date string) ([]workflow.Task, error) {
 	return tm.dbManager.GetTasksByDate(date)
 }
 
 // SearchTasks busca tareas según criterios específicos
-func (tm *TaskManagerSQLite) SearchTasks(query string, category string, status string, date string) ([]harvest.Task, error) {
+func (tm *TaskManagerSQLite) SearchTasks(query string, category string, status string, date string) ([]workflow.Task, error) {
 	return tm.dbManager.SearchTasks(query, category, status, date)
 }
 
@@ -130,7 +130,7 @@ func (tm *TaskManagerSQLite) CompleteTask(id int) error {
 	}
 
 	// Marcar como completada
-	task.Status = harvest.StatusCompleted
+	task.Status = workflow.StatusCompleted
 
 	// Guardar cambios
 	return tm.dbManager.UpdateTask(task)
@@ -145,7 +145,7 @@ func (tm *TaskManagerSQLite) UpdateTaskStatus(id int, status string) error {
 	}
 
 	// Validar estado
-	validStatuses := []string{harvest.StatusPending, harvest.StatusInProgress, harvest.StatusCompleted, harvest.StatusPaused}
+	validStatuses := []string{workflow.StatusPending, workflow.StatusInProgress, workflow.StatusCompleted, workflow.StatusPaused}
 	isValid := false
 	for _, validStatus := range validStatuses {
 		if status == validStatus {
@@ -166,7 +166,7 @@ func (tm *TaskManagerSQLite) UpdateTaskStatus(id int, status string) error {
 }
 
 // GetTotalHours calcula el total de horas de una lista de tareas
-func (tm *TaskManagerSQLite) GetTotalHours(tasks []harvest.Task) float64 {
+func (tm *TaskManagerSQLite) GetTotalHours(tasks []workflow.Task) float64 {
 	total := 0.0
 	for _, task := range tasks {
 		total += task.Hours
@@ -195,6 +195,6 @@ func (tm *TaskManagerSQLite) GetDatabasePath() string {
 }
 
 // SaveTaskToDatabase guarda una tarea directamente en la base de datos
-func (tm *TaskManagerSQLite) SaveTaskToDatabase(task *harvest.Task) error {
+func (tm *TaskManagerSQLite) SaveTaskToDatabase(task *workflow.Task) error {
 	return tm.dbManager.SaveTask(task)
 }

@@ -5,19 +5,19 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 )
 
 // ConfigManager maneja la configuración del usuario
 type ConfigManager struct {
 	configPath string
-	config     *harvest.Config
+	config     *workflow.Config
 }
 
 // NewConfigManager crea un nuevo gestor de configuración
 func NewConfigManager() *ConfigManager {
 	homeDir, _ := os.UserHomeDir()
-	configPath := filepath.Join(homeDir, ".harvest", "config.json")
+	configPath := filepath.Join(homeDir, ".workflow", "config.json")
 
 	return &ConfigManager{
 		configPath: configPath,
@@ -26,11 +26,11 @@ func NewConfigManager() *ConfigManager {
 }
 
 // getDefaultConfig devuelve la configuración por defecto
-func getDefaultConfig(homeDir string) *harvest.Config {
-	return &harvest.Config{
+func getDefaultConfig(homeDir string) *workflow.Config {
+	return &workflow.Config{
 		DailyHoursTarget:  8.0,
 		DailyStandupHours: 0.25,
-		DataFile:          filepath.Join(homeDir, ".harvest", "tasks.json"),
+		DataFile:          filepath.Join(homeDir, ".workflow", "tasks.json"),
 		UserName:          os.Getenv("USER"),
 		Company:           "",
 		Timezone:          "UTC",
@@ -71,7 +71,7 @@ func (cm *ConfigManager) Save() error {
 }
 
 // Get devuelve la configuración actual
-func (cm *ConfigManager) Get() *harvest.Config {
+func (cm *ConfigManager) Get() *workflow.Config {
 	return cm.config
 }
 

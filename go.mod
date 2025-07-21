@@ -1,4 +1,4 @@
-module github.com/lucasvidela94/harvest-cli
+module github.com/lucasvidela94/workflow-cli
 
 go 1.24.5
 

@@ -1,7 +1,7 @@
-# Makefile para Harvest CLI
+# Makefile para workflow CLI
 
 # Variables
-BINARY_NAME=harvest
+BINARY_NAME=workflow
 BUILD_DIR=build
 VERSION=1.1.0
 
@@ -32,8 +32,8 @@ all: build
 
 # Construir el binario
 build:
-	@echo "$(GREEN)🔨 Building Harvest CLI...$(NC)"
-	go build -o $(BINARY_NAME) ./cmd/harvest
+	@echo "$(GREEN)🔨 Building workflow CLI...$(NC)"
+	go build -o $(BINARY_NAME) ./cmd/workflow
 	@echo "$(GREEN)✅ Build completed!$(NC)"
 
 # Limpiar archivos generados
@@ -62,15 +62,15 @@ build-all: clean
 	mkdir -p $(BUILD_DIR)
 	
 	# Linux
-	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/harvest
-	GOOS=linux GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-arm64 ./cmd/harvest
+	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/workflow
+	GOOS=linux GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-arm64 ./cmd/workflow
 	
 	# macOS
-	GOOS=darwin GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/harvest
-	GOOS=darwin GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/harvest
+	GOOS=darwin GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/workflow
+	GOOS=darwin GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/workflow
 	
 	# Windows
-	GOOS=windows GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/harvest
+	GOOS=windows GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/workflow
 	
 	@echo "$(GREEN)✅ Multi-platform build completed!$(NC)"
 	@echo "$(YELLOW)📁 Binaries created in $(BUILD_DIR)/$(NC)"
@@ -83,13 +83,13 @@ install: build
 	@chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "$(GREEN)✅ Installed in $(INSTALL_DIR)/$(BINARY_NAME)$(NC)"
 	@echo ""
-	@echo "$(BLUE)💡 To use 'harvest' from anywhere:$(NC)"
+	@echo "$(BLUE)💡 To use 'workflow' from anywhere:$(NC)"
 	@echo "1. Add $(INSTALL_DIR) to your PATH"
 	@echo "2. Or run: export PATH=\"$(INSTALL_DIR):\$$PATH\""
 	@echo ""
 	@echo "$(BLUE)📝 Usage examples:$(NC)"
-	@echo "  harvest --help"
-	@echo "  harvest add 'Example task' 2.0"
+	@echo "  workflow --help"
+	@echo "  workflow add 'Example task' 2.0"
 
 # Instalación usando script (recomendado)
 install-script:
@@ -144,7 +144,7 @@ check:
 
 # Ejecutar el binario
 run: build
-	@echo "$(GREEN)🚀 Running Harvest CLI...$(NC)"
+	@echo "$(GREEN)🚀 Running workflow CLI...$(NC)"
 	./$(BINARY_NAME)
 
 # Modo desarrollo
@@ -161,7 +161,7 @@ code-check:
 
 # Ayuda
 help:
-	@echo "$(GREEN)🌾 Harvest CLI - Makefile$(NC)"
+	@echo "$(GREEN)🌾 workflow CLI - Makefile$(NC)"
 	@echo ""
 	@echo "$(YELLOW)🔨 Build commands:$(NC)"
 	@echo "  make build         - Build the binary"

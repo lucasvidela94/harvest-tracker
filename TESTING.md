@@ -1,12 +1,12 @@
-# 🧪 Testing de Harvest CLI
+# 🧪 Testing de workflow CLI
 
-Este documento describe cómo ejecutar tests automatizados para Harvest CLI usando Docker.
+Este documento describe cómo ejecutar tests automatizados para workflow CLI usando Docker.
 
 ## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 - Docker instalado y funcionando
-- Binario `harvest` compilado en el directorio raíz
+- Binario `workflow` compilado en el directorio raíz
 
 ### Ejecutar todos los tests
 ```bash
@@ -78,7 +78,7 @@ make -f Makefile.test test-help
 ### 5. **Reportes y Exportación**
 - ✅ Reportes diarios
 - ✅ Reportes semanales
-- ✅ Formato legacy para Harvest
+- ✅ Formato legacy para workflow
 - ✅ Exportación a CSV
 - ✅ Exportación a JSON
 
@@ -88,7 +88,7 @@ make -f Makefile.test test-help
 - ✅ Verificación de estructura de archivos
 
 ### 7. **Estructura de Archivos**
-- ✅ Creación de directorio .harvest
+- ✅ Creación de directorio .workflow
 - ✅ Archivo de configuración
 - ✅ Base de datos SQLite
 
@@ -100,8 +100,8 @@ Edita el archivo `test.sh` y agrega nuevos casos de prueba:
 ```bash
 # Test personalizado
 print_info "Test personalizado"
-harvest add "Mi test" 1.0
-check_exit "harvest add personalizado"
+workflow add "Mi test" 1.0
+check_exit "workflow add personalizado"
 ```
 
 ### Modificar Dockerfile
@@ -122,18 +122,18 @@ Puedes ejecutar solo partes del script:
 
 ```bash
 # Solo tests básicos
-docker run --rm harvest-test bash -c "
-    harvest --version && \
-    harvest add 'test' 1.0 && \
-    harvest status
+docker run --rm workflow-test bash -c "
+    workflow --version && \
+    workflow add 'test' 1.0 && \
+    workflow status
 "
 ```
 
 ## 🐛 Troubleshooting
 
-### Error: "harvest: command not found"
-- Verifica que el binario `harvest` existe en el directorio raíz
-- Asegúrate de que tiene permisos de ejecución: `chmod +x harvest`
+### Error: "workflow: command not found"
+- Verifica que el binario `workflow` existe en el directorio raíz
+- Asegúrate de que tiene permisos de ejecución: `chmod +x workflow`
 
 ### Error: "permission denied"
 - Ejecuta con sudo si es necesario: `sudo make -f Makefile.test test-run`
@@ -151,14 +151,14 @@ docker run --rm harvest-test bash -c "
 
 ### ✅ Éxito
 ```
-✅ harvest --version
-✅ harvest add task 1
+✅ workflow --version
+✅ workflow add task 1
 ✅ Todos los tests básicos pasaron
 ```
 
 ### ❌ Fallo
 ```
-❌ harvest add task 1
+❌ workflow add task 1
 Error: could not add task
 ```
 
@@ -171,7 +171,7 @@ Error: could not add task
 
 ### GitHub Actions
 ```yaml
-name: Test Harvest CLI
+name: Test workflow CLI
 on: [push, pull_request]
 jobs:
   test:
@@ -212,4 +212,4 @@ Para agregar nuevos tests:
 3. Actualiza esta documentación si es necesario
 4. Haz commit de los cambios
 
-¡Los tests ayudan a mantener la calidad y confiabilidad de Harvest CLI! 
+¡Los tests ayudan a mantener la calidad y confiabilidad de workflow CLI! 

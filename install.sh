@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de instalación para Harvest CLI
+# Script de instalación para workflow CLI
 # Instala el binario en el PATH del sistema
 
 set -e
@@ -104,9 +104,9 @@ detect_previous_config() {
     esac
     
     if [[ -n "$shell_rc" ]]; then
-        # Buscar alias de harvest
-        if grep -q "alias harvest=" "$shell_rc"; then
-            found_configs+=("alias harvest en $shell_rc")
+        # Buscar alias de workflow
+        if grep -q "alias workflow=" "$shell_rc"; then
+            found_configs+=("alias workflow en $shell_rc")
         fi
         
         # Buscar alias de finish
@@ -120,7 +120,7 @@ detect_previous_config() {
         fi
         
         # Buscar configuraciones de PATH
-        if grep -q "export PATH.*harvest" "$shell_rc"; then
+        if grep -q "export PATH.*workflow" "$shell_rc"; then
             found_configs+=("configuración de PATH en $shell_rc")
         fi
     fi
@@ -151,12 +151,12 @@ cleanup_previous_config() {
         cp "$shell_rc" "$shell_rc.backup"
         
         # Remover configuraciones previas
-        if grep -q "harvest" "$shell_rc"; then
-            sed -i '/alias harvest=/d' "$shell_rc"
+        if grep -q "workflow" "$shell_rc"; then
+            sed -i '/alias workflow=/d' "$shell_rc"
             sed -i '/alias finish=/d' "$shell_rc"
             sed -i '/alias week=/d' "$shell_rc"
-            sed -i '/# Harvest CLI/d' "$shell_rc"
-            sed -i '/export PATH.*harvest/d' "$shell_rc"
+            sed -i '/# workflow CLI/d' "$shell_rc"
+            sed -i '/export PATH.*workflow/d' "$shell_rc"
             
             print_success "Configuraciones previas removidas de $shell_rc"
             print_info "Backup creado en $shell_rc.backup"
@@ -191,7 +191,7 @@ add_to_path() {
     if [[ -n "$shell_rc" ]]; then
         if ! grep -q "$install_dir" "$shell_rc"; then
             echo "" >> "$shell_rc"
-            echo "# Harvest CLI" >> "$shell_rc"
+            echo "# workflow CLI" >> "$shell_rc"
             echo "export PATH=\"$install_dir:\$PATH\"" >> "$shell_rc"
             print_success "Agregado al PATH en $shell_rc"
             print_info "Ejecuta 'source $shell_rc' o reinicia tu terminal"
@@ -206,7 +206,7 @@ add_to_path() {
 
 # Función principal de instalación
 main() {
-    print_info "🚀 Instalando Harvest CLI..."
+    print_info "🚀 Instalando workflow CLI..."
     
     # Detectar sistema
     local os=$(detect_os)
@@ -247,15 +247,15 @@ main() {
     fi
     
     # Compilar el proyecto
-    print_info "🔨 Compilando Harvest CLI..."
-    if ! go build -o harvest ./cmd/harvest; then
+    print_info "🔨 Compilando workflow CLI..."
+    if ! go build -o workflow ./cmd/workflow; then
         print_error "Error al compilar el proyecto"
         exit 1
     fi
     
     # Obtener ruta de instalación
     local install_dir=$(get_install_path)
-    local install_path="$install_dir/harvest"
+    local install_path="$install_dir/workflow"
     
     # Crear directorio de instalación si no existe
     if [[ ! -d "$install_dir" ]]; then
@@ -271,7 +271,7 @@ main() {
     
     # Instalar el binario
     print_info "📦 Instalando en: $install_path"
-    if ! cp harvest "$install_path"; then
+    if ! cp workflow "$install_path"; then
         print_error "Error al copiar el binario"
         exit 1
     fi
@@ -281,7 +281,7 @@ main() {
     
     # Verificar instalación
     if [[ -f "$install_path" ]]; then
-        print_success "Harvest CLI instalado exitosamente!"
+        print_success "workflow CLI instalado exitosamente!"
     else
         print_error "Error en la instalación"
         exit 1
@@ -299,18 +299,18 @@ main() {
     echo ""
     print_success "🎉 Instalación completada!"
     echo ""
-    print_info "Para usar Harvest CLI:"
-    echo "  harvest --help"
+    print_info "Para usar workflow CLI:"
+    echo "  workflow --help"
     echo ""
     print_info "Ejemplos de uso:"
-    echo "  harvest add 'Tarea de ejemplo' 2.0"
-    echo "  harvest status"
-    echo "  harvest report"
-    echo "  harvest upgrade"
+    echo "  workflow add 'Tarea de ejemplo' 2.0"
+    echo "  workflow status"
+    echo "  workflow report"
+    echo "  workflow upgrade"
     echo ""
     
     if [[ "$os" != "windows" ]]; then
-        print_warning "Si 'harvest' no funciona, ejecuta:"
+        print_warning "Si 'workflow' no funciona, ejecuta:"
         echo "  source ~/.bashrc  # o ~/.zshrc"
         echo "  # O reinicia tu terminal"
     fi

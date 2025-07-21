@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -81,7 +81,7 @@ func (dm *DatabaseManager) createTables() error {
 }
 
 // LoadTasks carga todas las tareas desde la base de datos
-func (dm *DatabaseManager) LoadTasks() ([]harvest.Task, error) {
+func (dm *DatabaseManager) LoadTasks() ([]workflow.Task, error) {
 	query := `SELECT id, description, hours, category, date, status, created_at FROM tasks ORDER BY date DESC, id DESC`
 
 	rows, err := dm.db.Query(query)
@@ -90,9 +90,9 @@ func (dm *DatabaseManager) LoadTasks() ([]harvest.Task, error) {
 	}
 	defer rows.Close()
 
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 	for rows.Next() {
-		var task harvest.Task
+		var task workflow.Task
 		var createdAtStr string
 
 		err := rows.Scan(&task.ID, &task.Description, &task.Hours, &task.Category, &task.Date, &task.Status, &createdAtStr)
@@ -114,7 +114,7 @@ func (dm *DatabaseManager) LoadTasks() ([]harvest.Task, error) {
 }
 
 // SaveTask guarda una nueva tarea en la base de datos
-func (dm *DatabaseManager) SaveTask(task *harvest.Task) error {
+func (dm *DatabaseManager) SaveTask(task *workflow.Task) error {
 	query := `
 	INSERT INTO tasks (description, hours, category, date, status, created_at)
 	VALUES (?, ?, ?, ?, ?, ?)
@@ -136,7 +136,7 @@ func (dm *DatabaseManager) SaveTask(task *harvest.Task) error {
 }
 
 // UpdateTask actualiza una tarea existente
-func (dm *DatabaseManager) UpdateTask(task *harvest.Task) error {
+func (dm *DatabaseManager) UpdateTask(task *workflow.Task) error {
 	query := `
 	UPDATE tasks 
 	SET description = ?, hours = ?, category = ?, date = ?, status = ?, updated_at = CURRENT_TIMESTAMP
@@ -182,10 +182,10 @@ func (dm *DatabaseManager) DeleteTask(id int) error {
 }
 
 // GetTaskByID obtiene una tarea específica por ID
-func (dm *DatabaseManager) GetTaskByID(id int) (*harvest.Task, error) {
+func (dm *DatabaseManager) GetTaskByID(id int) (*workflow.Task, error) {
 	query := `SELECT id, description, hours, category, date, status, created_at FROM tasks WHERE id = ?`
 
-	var task harvest.Task
+	var task workflow.Task
 	var createdAtStr string
 
 	err := dm.db.QueryRow(query, id).Scan(&task.ID, &task.Description, &task.Hours, &task.Category, &task.Date, &task.Status, &createdAtStr)
@@ -207,7 +207,7 @@ func (dm *DatabaseManager) GetTaskByID(id int) (*harvest.Task, error) {
 }
 
 // GetTasksByDate obtiene tareas de una fecha específica
-func (dm *DatabaseManager) GetTasksByDate(date string) ([]harvest.Task, error) {
+func (dm *DatabaseManager) GetTasksByDate(date string) ([]workflow.Task, error) {
 	query := `SELECT id, description, hours, category, date, status, created_at FROM tasks WHERE date = ? ORDER BY id`
 
 	rows, err := dm.db.Query(query, date)
@@ -216,9 +216,9 @@ func (dm *DatabaseManager) GetTasksByDate(date string) ([]harvest.Task, error) {
 	}
 	defer rows.Close()
 
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 	for rows.Next() {
-		var task harvest.Task
+		var task workflow.Task
 		var createdAtStr string
 
 		err := rows.Scan(&task.ID, &task.Description, &task.Hours, &task.Category, &task.Date, &task.Status, &createdAtStr)
@@ -240,7 +240,7 @@ func (dm *DatabaseManager) GetTasksByDate(date string) ([]harvest.Task, error) {
 }
 
 // SearchTasks busca tareas según criterios específicos
-func (dm *DatabaseManager) SearchTasks(query string, category string, status string, date string) ([]harvest.Task, error) {
+func (dm *DatabaseManager) SearchTasks(query string, category string, status string, date string) ([]workflow.Task, error) {
 	baseQuery := `SELECT id, description, hours, category, date, status, created_at FROM tasks WHERE 1=1`
 	var args []interface{}
 	var conditions []string
@@ -280,9 +280,9 @@ func (dm *DatabaseManager) SearchTasks(query string, category string, status str
 	}
 	defer rows.Close()
 
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 	for rows.Next() {
-		var task harvest.Task
+		var task workflow.Task
 		var createdAtStr string
 
 		err := rows.Scan(&task.ID, &task.Description, &task.Hours, &task.Category, &task.Date, &task.Status, &createdAtStr)

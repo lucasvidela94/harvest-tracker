@@ -23,7 +23,7 @@ type DownloadManager struct {
 // NewDownloadManager crea un nuevo gestor de descarga
 func NewDownloadManager() *DownloadManager {
 	homeDir, _ := os.UserHomeDir()
-	downloadDir := filepath.Join(homeDir, ".harvest", "downloads")
+	downloadDir := filepath.Join(homeDir, ".workflow", "downloads")
 
 	// Crear cliente HTTP con timeout
 	client := &http.Client{
@@ -101,9 +101,9 @@ func (dm *DownloadManager) GetDownloadURL(version string) (string, error) {
 	}
 
 	// Construir URL de descarga
-	// Formato: https://github.com/{owner}/{repo}/releases/download/v{version}/harvest-{version}-{os}-{arch}.tar.gz
+	// Formato: https://github.com/{owner}/{repo}/releases/download/v{version}/workflow-{version}-{os}-{arch}.tar.gz
 	downloadURL := fmt.Sprintf(
-		"https://github.com/%s/%s/releases/download/v%s/harvest-%s-%s-%s.tar.gz",
+		"https://github.com/%s/%s/releases/download/v%s/workflow-%s-%s-%s.tar.gz",
 		RepoOwner,
 		RepoName,
 		version,
@@ -137,7 +137,7 @@ func (dm *DownloadManager) GetFilename(version string) string {
 	archName := archMap[arch]
 	osName := osMap[os]
 
-	return fmt.Sprintf("harvest-%s-%s-%s.tar.gz", version, osName, archName)
+	return fmt.Sprintf("workflow-%s-%s-%s.tar.gz", version, osName, archName)
 }
 
 // downloadFile descarga un archivo desde una URL
@@ -149,7 +149,7 @@ func (dm *DownloadManager) downloadFile(url, destPath string) error {
 	}
 
 	// Agregar User-Agent para evitar bloqueos
-	req.Header.Set("User-Agent", "harvest-cli-go/1.0")
+	req.Header.Set("User-Agent", "workflow-cli-go/1.0")
 
 	// Realizar request
 	resp, err := dm.client.Do(req)
@@ -258,7 +258,7 @@ func (dm *DownloadManager) GetDownloadSize(url string) (int64, error) {
 		return 0, fmt.Errorf("could not create request: %v", err)
 	}
 
-	req.Header.Set("User-Agent", "harvest-cli-go/1.0")
+	req.Header.Set("User-Agent", "workflow-cli-go/1.0")
 
 	resp, err := dm.client.Do(req)
 	if err != nil {

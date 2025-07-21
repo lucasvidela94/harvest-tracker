@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script para probar la instalación enterprise de Harvest CLI usando Docker
-# Versión fija para evitar problemas con la API de GitHub
+# Script para probar la instalación enterprise de workflow CLI usando Docker
+# Usa el binario local para evitar problemas con releases inexistentes
 
 set -e
 
@@ -12,12 +12,19 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🐳 Probando instalación enterprise de Harvest CLI (v2.0.1)${NC}"
-echo -e "${YELLOW}Este script construirá un contenedor Docker y probará la instalación automática${NC}"
+echo -e "${BLUE}🐳 Probando workflow CLI con binario local${NC}"
+echo -e "${YELLOW}Este script construirá un contenedor Docker y probará la funcionalidad${NC}"
 
-# Crear Dockerfile temporal con versión fija
+# Verificar que existe el binario
+if [ ! -f "./workflow" ]; then
+    echo -e "${RED}❌ Error: No se encontró el binario './workflow'${NC}"
+    echo -e "${YELLOW}Ejecuta 'make build' primero${NC}"
+    exit 1
+fi
+
+# Crear Dockerfile temporal que use el binario local
 cat > Dockerfile.test << 'EOF'
-# Dockerfile para probar la instalación enterprise de Harvest CLI
+# Dockerfile para probar workflow CLI
 FROM ubuntu:22.04
 
 # Evitar prompts interactivos durante la instalación
@@ -32,45 +39,41 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear usuario no-root para probar la instalación
-RUN useradd -m -s /bin/bash harvest-user
-USER harvest-user
-WORKDIR /home/harvest-user
+# Crear usuario no-root para probar
+RUN useradd -m -s /bin/bash workflow-user
 
-# Probar el método de instalación enterprise con versión específica
-RUN echo "🚀 Probando instalación enterprise de Harvest CLI..." && \
-    echo "📦 Descargando versión v2.0.1..." && \
-    wget https://github.com/lucasvidela94/harvest-tracker/releases/download/v2.0.1/harvest-v2.0.1-linux-amd64.tar.gz && \
-    tar -xzf harvest-v2.0.1-linux-amd64.tar.gz && \
-    mv harvest-v2.0.1-linux-amd64/harvest ~/harvest && \
-    chmod +x ~/harvest && \
-    echo 'export PATH="$HOME:$PATH"' >> ~/.bashrc && \
-    export PATH="$HOME:$PATH"
+# Copiar el binario local y cambiar permisos como root
+COPY workflow /home/workflow-user/workflow
+RUN chmod +x /home/workflow-user/workflow && \
+    chown workflow-user:workflow-user /home/workflow-user/workflow
+
+USER workflow-user
+WORKDIR /home/workflow-user
 
 # Verificar que la instalación funcionó
 RUN echo "✅ Verificando instalación..." && \
-    ~/harvest version && \
-    ~/harvest --help
+    ~/workflow version && \
+    ~/workflow --help
 
 # Probar algunos comandos básicos
 RUN echo "🧪 Probando comandos básicos..." && \
-    ~/harvest add "Tarea de prueba" 2.0 && \
-    ~/harvest status && \
-    ~/harvest list
+    ~/workflow add "Tarea de prueba" 2.0 && \
+    ~/workflow status && \
+    ~/workflow list
 
 # Mostrar información del sistema
 RUN echo "📊 Información del sistema:" && \
     echo "OS: $(uname -s)" && \
     echo "Arch: $(uname -m)" && \
-    echo "Harvest CLI: $(~/harvest version)"
+    echo "workflow CLI: $(~/workflow version)"
 
 # Comando por defecto
-CMD ["/home/harvest-user/harvest", "--help"]
+CMD ["/home/workflow-user/workflow", "--help"]
 EOF
 
 # Construir la imagen Docker
 echo -e "\n${BLUE}🔨 Construyendo imagen Docker...${NC}"
-docker build -f Dockerfile.test -t harvest-cli-test-fixed .
+docker build -f Dockerfile.test -t workflow-cli-test-fixed .
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Imagen construida exitosamente${NC}"
@@ -81,35 +84,34 @@ fi
 
 # Ejecutar el contenedor para probar la instalación
 echo -e "\n${BLUE}🚀 Ejecutando contenedor de prueba...${NC}"
-echo -e "${YELLOW}Esto probará la instalación automática y comandos básicos${NC}"
+echo -e "${YELLOW}Esto probará la funcionalidad básica${NC}"
 
-docker run --rm harvest-cli-test-fixed
+docker run --rm workflow-cli-test-fixed
 
 # Probar comandos interactivos
 echo -e "\n${BLUE}🧪 Probando comandos interactivos...${NC}"
-docker run --rm -it harvest-cli-test-fixed bash -c "
+docker run --rm -it workflow-cli-test-fixed bash -c "
 echo '📝 Agregando tareas de prueba...'
-~/harvest add 'Desarrollo de feature' 4.0
-~/harvest add 'Reunión de equipo' 1.5
-~/harvest add 'Testing' 2.0
+~/workflow add 'Desarrollo de feature' 4.0
+~/workflow add 'Reunión de equipo' 1.5
+~/workflow add 'Testing' 2.0
 
 echo '📊 Mostrando estado...'
-~/harvest status
+~/workflow status
 
 echo '📋 Listando tareas...'
-~/harvest list
+~/workflow list
 
 echo '🔍 Buscando tareas...'
-~/harvest search 'feature'
+~/workflow search 'feature'
 
 echo '📈 Generando reporte...'
-~/harvest report
-
-echo '✅ ¡Todas las pruebas completadas exitosamente!'
+~/workflow report
 "
 
-# Limpiar archivos temporales
+# Limpiar
+echo -e "\n${BLUE}🧹 Limpiando archivos temporales...${NC}"
 rm -f Dockerfile.test
+docker rmi workflow-cli-test-fixed 2>/dev/null || true
 
-echo -e "\n${GREEN}🎉 ¡Prueba de instalación enterprise completada!${NC}"
-echo -e "${BLUE}💡 La instalación automática funciona correctamente${NC}" 
+echo -e "${GREEN}✅ Test completado exitosamente${NC}" 

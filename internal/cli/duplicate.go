@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/internal/core"
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 	"github.com/spf13/cobra"
 )
 
@@ -28,10 +28,10 @@ var duplicateCmd = &cobra.Command{
 You can specify a different date for the duplicated task using flags.
 
 Examples:
-  harvest duplicate 1
-  harvest duplicate 1 --date 2025-07-22
-  harvest duplicate 1 --tomorrow
-  harvest duplicate 1 --yesterday
+  workflow duplicate 1
+  workflow duplicate 1 --date 2025-07-22
+  workflow duplicate 1 --tomorrow
+  workflow duplicate 1 --yesterday
 `,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -93,18 +93,18 @@ func performDuplicate(taskID int, targetDate string) {
 	fmt.Printf("📋 Original task:\n")
 	fmt.Printf("[%d] %s %s (%.1fh, %s) %s\n",
 		originalTask.ID,
-		harvest.GetIcon(originalTask.Category),
+		workflow.GetIcon(originalTask.Category),
 		originalTask.Description,
 		originalTask.Hours,
 		originalTask.Category,
-		harvest.GetStatusIcon(originalTask.Status))
+		workflow.GetStatusIcon(originalTask.Status))
 
 	// Crear nueva tarea
-	newTask := &harvest.Task{
+	newTask := &workflow.Task{
 		Description: originalTask.Description,
 		Hours:       originalTask.Hours,
 		Category:    originalTask.Category,
-		Status:      harvest.StatusPending, // Siempre pendiente al duplicar
+		Status:      workflow.StatusPending, // Siempre pendiente al duplicar
 		CreatedAt:   time.Now(),
 	}
 
@@ -126,11 +126,11 @@ func performDuplicate(taskID int, targetDate string) {
 	fmt.Printf("📝 New task:\n")
 	fmt.Printf("[%d] %s %s (%.1fh, %s) %s - %s\n",
 		newTask.ID,
-		harvest.GetIcon(newTask.Category),
+		workflow.GetIcon(newTask.Category),
 		newTask.Description,
 		newTask.Hours,
 		newTask.Category,
-		harvest.GetStatusIcon(newTask.Status),
+		workflow.GetStatusIcon(newTask.Status),
 		newTask.Date)
 
 	// Mostrar estado actualizado

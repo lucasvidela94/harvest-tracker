@@ -62,7 +62,7 @@ fi
 # Test 2: Verificar que tenemos los archivos necesarios
 print_info "Test 2: Verificar archivos de instalación"
 check_file "install-binary.sh"
-check_file "releases/harvest-v2.0.0-linux-amd64.tar.gz"
+check_file "releases/workflow-v2.0.0-linux-amd64.tar.gz"
 
 # Test 3: Verificar que el script es ejecutable
 print_info "Test 3: Verificar permisos del script"
@@ -76,58 +76,58 @@ fi
 
 # Test 4: Simular instalación en directorio temporal
 print_info "Test 4: Simular instalación"
-mkdir -p /tmp/harvest-test
-cd /tmp/harvest-test
+mkdir -p /tmp/workflow-test
+cd /tmp/workflow-test
 
 # Crear estructura mínima
 mkdir -p releases
-cp /test/releases/harvest-v2.0.0-linux-amd64.tar.gz releases/
+cp /test/releases/workflow-v2.0.0-linux-amd64.tar.gz releases/
 
 # Ejecutar instalación
 print_info "Ejecutando install-binary.sh..."
 bash /test/install-binary.sh
 check_exit "install-binary.sh ejecutado"
 
-# Test 5: Verificar que harvest fue instalado
+# Test 5: Verificar que workflow fue instalado
 print_info "Test 5: Verificar instalación"
-if [ -f "$HOME/.local/bin/harvest" ]; then
-    print_success "harvest instalado en $HOME/.local/bin/harvest"
+if [ -f "$HOME/.local/bin/workflow" ]; then
+    print_success "workflow instalado en $HOME/.local/bin/workflow"
 else
-    print_error "harvest no fue instalado"
+    print_error "workflow no fue instalado"
     exit 1
 fi
 
-# Test 6: Verificar que harvest funciona
-print_info "Test 6: Verificar que harvest funciona"
-$HOME/.local/bin/harvest version
-check_exit "harvest version"
+# Test 6: Verificar que workflow funciona
+print_info "Test 6: Verificar que workflow funciona"
+$HOME/.local/bin/workflow version
+check_exit "workflow version"
 
-$HOME/.local/bin/harvest --help
-check_exit "harvest --help"
+$HOME/.local/bin/workflow --help
+check_exit "workflow --help"
 
 # Test 7: Probar funcionalidad básica
 print_info "Test 7: Probar funcionalidad básica"
-$HOME/.local/bin/harvest add "Test task" 1.0
-check_exit "harvest add"
+$HOME/.local/bin/workflow add "Test task" 1.0
+check_exit "workflow add"
 
-$HOME/.local/bin/harvest status
-check_exit "harvest status"
+$HOME/.local/bin/workflow status
+check_exit "workflow status"
 
-$HOME/.local/bin/harvest report --harvest
-check_exit "harvest report --harvest"
+$HOME/.local/bin/workflow report --workflow
+check_exit "workflow report --workflow"
 
 # Test 8: Verificar que se creó la estructura de datos
 print_info "Test 8: Verificar estructura de datos"
-if [ -d "$HOME/.harvest" ]; then
-    print_success "Directorio .harvest creado"
+if [ -d "$HOME/.workflow" ]; then
+    print_success "Directorio .workflow creado"
 else
-    print_error "Directorio .harvest no fue creado"
+    print_error "Directorio .workflow no fue creado"
     exit 1
 fi
 
 # Test 9: Verificar base de datos SQLite
 print_info "Test 9: Verificar base de datos SQLite"
-if [ -f "$HOME/.harvest/tasks.db" ]; then
+if [ -f "$HOME/.workflow/tasks.db" ]; then
     print_success "Base de datos SQLite creada"
 else
     print_warning "Base de datos SQLite no existe (se creará automáticamente)"
@@ -135,9 +135,9 @@ fi
 
 # Test 10: Verificar archivo de configuración
 print_info "Test 10: Verificar archivo de configuración"
-if [ -f "$HOME/.harvest/config.json" ]; then
+if [ -f "$HOME/.workflow/config.json" ]; then
     print_success "Archivo de configuración creado"
-    cat "$HOME/.harvest/config.json"
+    cat "$HOME/.workflow/config.json"
 else
     print_warning "Archivo de configuración no existe (se creará automáticamente)"
 fi
@@ -151,7 +151,7 @@ echo "📊 Resumen:"
 echo "  ✅ Go NO está instalado (correcto)"
 echo "  ✅ Script de instalación funciona"
 echo "  ✅ Binario se instala correctamente"
-echo "  ✅ Harvest CLI funciona sin Go"
+echo "  ✅ workflow CLI funciona sin Go"
 echo "  ✅ Estructura de datos se crea"
 echo "  ✅ Funcionalidad básica funciona"
 echo ""

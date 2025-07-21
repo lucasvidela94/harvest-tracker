@@ -61,14 +61,14 @@ func AutoUpdate(currentVersion string) error {
 	}
 
 	// Crear directorio temporal
-	tempDir, err := os.MkdirTemp("", "harvest-update-*")
+	tempDir, err := os.MkdirTemp("", "workflow-update-*")
 	if err != nil {
 		return fmt.Errorf("error creando directorio temporal: %w", err)
 	}
 	defer os.RemoveAll(tempDir)
 
 	// Descargar archivo
-	archivePath := filepath.Join(tempDir, "harvest-update.tar.gz")
+	archivePath := filepath.Join(tempDir, "workflow-update.tar.gz")
 	if err := downloadFile(downloadURL, archivePath); err != nil {
 		return fmt.Errorf("error descargando archivo: %w", err)
 	}
@@ -91,9 +91,9 @@ func AutoUpdate(currentVersion string) error {
 	}
 
 	// Encontrar el nuevo ejecutable
-	newExePath := filepath.Join(tempDir, "harvest")
+	newExePath := filepath.Join(tempDir, "workflow")
 	if runtime.GOOS == "windows" {
-		newExePath = filepath.Join(tempDir, "harvest.exe")
+		newExePath = filepath.Join(tempDir, "workflow.exe")
 	}
 
 	// Reemplazar ejecutable
@@ -117,7 +117,7 @@ func AutoUpdate(currentVersion string) error {
 
 // getLatestVersion obtiene la última versión desde GitHub
 func getLatestVersion() (string, error) {
-	resp, err := http.Get("https://api.github.com/repos/lucasvidela94/harvest-tracker/releases/latest")
+	resp, err := http.Get("https://api.github.com/repos/lucasvidela94/workflow-cli/releases/latest")
 	if err != nil {
 		return "", err
 	}
@@ -138,7 +138,7 @@ func getLatestVersion() (string, error) {
 
 // getDownloadURL obtiene la URL de descarga para la plataforma actual
 func getDownloadURL(version string) (string, error) {
-	resp, err := http.Get("https://api.github.com/repos/lucasvidela94/harvest-tracker/releases/tags/" + version)
+	resp, err := http.Get("https://api.github.com/repos/lucasvidela94/workflow-cli/releases/tags/" + version)
 	if err != nil {
 		return "", err
 	}
@@ -163,7 +163,7 @@ func getDownloadURL(version string) (string, error) {
 		arch = "arm64"
 	}
 
-	expectedName := fmt.Sprintf("harvest-%s-%s-%s.tar.gz", version, os, arch)
+	expectedName := fmt.Sprintf("workflow-%s-%s-%s.tar.gz", version, os, arch)
 
 	// Buscar el asset correcto
 	for _, asset := range release.Assets {

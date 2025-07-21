@@ -18,8 +18,8 @@ type RollbackManager struct {
 // NewRollbackManager crea un nuevo gestor de rollback
 func NewRollbackManager() *RollbackManager {
 	homeDir, _ := os.UserHomeDir()
-	backupDir := filepath.Join(homeDir, ".harvest", "backup")
-	installDir := filepath.Join(homeDir, ".harvest", "install")
+	backupDir := filepath.Join(homeDir, ".workflow", "backup")
+	installDir := filepath.Join(homeDir, ".workflow", "install")
 
 	return &RollbackManager{
 		backupDir:  backupDir,
@@ -91,7 +91,7 @@ func (rm *RollbackManager) PerformRollback() error {
 // RestorePreviousVersion restaura la versión anterior del binario
 func (rm *RollbackManager) RestorePreviousVersion() error {
 	installPath := rm.getInstallPath()
-	backupPath := filepath.Join(rm.backupDir, "harvest.bak")
+	backupPath := filepath.Join(rm.backupDir, "workflow.bak")
 
 	// Verificar que existe backup del binario
 	if _, err := os.Stat(backupPath); os.IsNotExist(err) {
@@ -174,7 +174,7 @@ func (rm *RollbackManager) verifyDataRestoration() error {
 	criticalFiles := []string{"config.json", "tasks.json"}
 
 	for _, filename := range criticalFiles {
-		filePath := filepath.Join(rm.homeDir, ".harvest", filename)
+		filePath := filepath.Join(rm.homeDir, ".workflow", filename)
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
 			return fmt.Errorf("critical file missing after rollback: %s", filename)
 		}
@@ -242,7 +242,7 @@ func (rm *RollbackManager) CleanupRollbackLog() error {
 func (rm *RollbackManager) getInstallPath() string {
 	// Para desarrollo, instalar en ~/.local/bin
 	homeDir, _ := os.UserHomeDir()
-	return filepath.Join(homeDir, ".local", "bin", "harvest")
+	return filepath.Join(homeDir, ".local", "bin", "workflow")
 }
 
 // copyBinary copia un archivo binario
@@ -278,7 +278,7 @@ func (rm *RollbackManager) copyFileContent(src, dst *os.File) (int64, error) {
 // IsRollbackAvailable verifica si hay un rollback disponible
 func (rm *RollbackManager) IsRollbackAvailable() bool {
 	// Verificar que existe backup del binario
-	binaryBackup := filepath.Join(rm.backupDir, "harvest.bak")
+	binaryBackup := filepath.Join(rm.backupDir, "workflow.bak")
 	if _, err := os.Stat(binaryBackup); os.IsNotExist(err) {
 		return false
 	}
@@ -304,7 +304,7 @@ func (rm *RollbackManager) GetRollbackInfo() (map[string]interface{}, error) {
 	}
 
 	// Información del backup del binario
-	binaryBackup := filepath.Join(rm.backupDir, "harvest.bak")
+	binaryBackup := filepath.Join(rm.backupDir, "workflow.bak")
 	if stat, err := os.Stat(binaryBackup); err == nil {
 		info["binary_backup_size"] = stat.Size()
 		info["binary_backup_time"] = stat.ModTime()

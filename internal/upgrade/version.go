@@ -15,7 +15,7 @@ const (
 	// RepoOwner es el propietario del repositorio
 	RepoOwner = "lucasvidela94"
 	// RepoName es el nombre del repositorio
-	RepoName = "harvest-tracker"
+	RepoName = "workflow-cli"
 	// CurrentVersion es la versión actual de Go
 	CurrentVersion = "1.0.1"
 )
@@ -35,13 +35,13 @@ func NewVersionManager() *VersionManager {
 // DetectPythonInstallation detecta si existe una instalación de Python
 func (vm *VersionManager) DetectPythonInstallation() (bool, string, error) {
 	// Buscar el script de Python en el PATH
-	pythonPath, err := exec.LookPath("harvest")
+	pythonPath, err := exec.LookPath("workflow")
 	if err != nil {
 		return false, "", nil // No hay instalación Python
 	}
 
 	// Verificar que es el script de Python (no el binario de Go)
-	if strings.Contains(pythonPath, "scripts/harvest") || strings.HasSuffix(pythonPath, "harvest") {
+	if strings.Contains(pythonPath, "scripts/workflow") || strings.HasSuffix(pythonPath, "workflow") {
 		// Verificar si es un script Python (no un binario)
 		info, err := os.Stat(pythonPath)
 		if err != nil {
@@ -135,32 +135,32 @@ func (vm *VersionManager) GetBinaryName() string {
 	switch os {
 	case "linux":
 		if arch == "amd64" {
-			return "harvest-linux-amd64"
+			return "workflow-linux-amd64"
 		} else if arch == "arm64" {
-			return "harvest-linux-arm64"
+			return "workflow-linux-arm64"
 		}
 	case "darwin":
 		if arch == "amd64" {
-			return "harvest-darwin-amd64"
+			return "workflow-darwin-amd64"
 		} else if arch == "arm64" {
-			return "harvest-darwin-arm64"
+			return "workflow-darwin-arm64"
 		}
 	case "windows":
 		if arch == "amd64" {
-			return "harvest-windows-amd64.exe"
+			return "workflow-windows-amd64.exe"
 		}
 	}
 
 	// Fallback
-	return "harvest"
+	return "workflow"
 }
 
 // GetInstallationPath obtiene la ruta de instalación actual
 func (vm *VersionManager) GetInstallationPath() (string, error) {
 	// Buscar en el PATH
-	path, err := exec.LookPath("harvest")
+	path, err := exec.LookPath("workflow")
 	if err != nil {
-		return "", fmt.Errorf("harvest not found in PATH: %v", err)
+		return "", fmt.Errorf("workflow not found in PATH: %v", err)
 	}
 
 	return path, nil

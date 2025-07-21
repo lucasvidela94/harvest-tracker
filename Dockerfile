@@ -1,4 +1,4 @@
-# Dockerfile para probar la instalación enterprise de Harvest CLI
+# Dockerfile para probar la instalación enterprise de workflow CLI
 FROM ubuntu:22.04
 
 # Evitar prompts interactivos durante la instalación
@@ -14,31 +14,31 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Crear usuario no-root para probar la instalación
-RUN useradd -m -s /bin/bash harvest-user
-USER harvest-user
-WORKDIR /home/harvest-user
+RUN useradd -m -s /bin/bash workflow-user
+USER workflow-user
+WORKDIR /home/workflow-user
 
 # Probar el método de instalación enterprise
-RUN echo "🚀 Probando instalación enterprise de Harvest CLI..." && \
+RUN echo "🚀 Probando instalación enterprise de workflow CLI..." && \
     echo "📦 Descargando e instalando..." && \
-    curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/lucasvidela94/workflow-cli/main/install-latest.sh | bash
 
 # Verificar que la instalación funcionó
 RUN echo "✅ Verificando instalación..." && \
-    harvest version && \
-    harvest --help
+    workflow version && \
+    workflow --help
 
 # Probar algunos comandos básicos
 RUN echo "🧪 Probando comandos básicos..." && \
-    harvest add "Tarea de prueba" 2.0 && \
-    harvest status && \
-    harvest list
+    workflow add "Tarea de prueba" 2.0 && \
+    workflow status && \
+    workflow list
 
 # Mostrar información del sistema
 RUN echo "📊 Información del sistema:" && \
     echo "OS: $(uname -s)" && \
     echo "Arch: $(uname -m)" && \
-    echo "Harvest CLI: $(harvest version)"
+    echo "workflow CLI: $(workflow version)"
 
 # Comando por defecto
-CMD ["harvest", "--help"] 
+CMD ["workflow", "--help"] 

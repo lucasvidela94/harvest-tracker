@@ -8,18 +8,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/internal/core"
-	"github.com/lucasvidela94/harvest-cli/internal/upgrade"
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
+	"github.com/lucasvidela94/workflow-cli/internal/upgrade"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "harvest",
-	Short: "Harvest CLI - Task tracking for Harvest",
-	Long: `🌾 Harvest CLI - Simple command line interface for task tracking
+	Use:   "workflow",
+	Short: "workflow CLI - Task tracking for workflow",
+	Long: `🌾 workflow CLI - Simple command line interface for task tracking
 
-A simple and efficient tool for tracking your daily tasks and generating reports for Harvest.`,
+A simple and efficient tool for tracking your daily tasks and generating reports for workflow.`,
 }
 
 // Execute ejecuta el comando raíz
@@ -30,10 +30,10 @@ func Execute() error {
 // init inicializa los comandos
 func init() {
 	// Comando de ayuda personalizado
-	rootCmd.SetHelpTemplate(`🌾 Harvest CLI - Enterprise Task Management Tool
+	rootCmd.SetHelpTemplate(`🌾 workflow CLI - Enterprise Task Management Tool
 
 Usage:
-  harvest [command] [args...]
+  workflow [command] [args...]
 
 Available Commands:
   add         Add a new task with description and hours
@@ -42,7 +42,7 @@ Available Commands:
   qa          Add a QA/testing task
   daily       Add daily standup meeting
   status      Show today's task status and progress
-  report      Generate detailed report for Harvest
+  report      Generate detailed report for workflow
   list        List tasks with filters (date, category, status)
   search      Search tasks by text, category, or status
   edit        Edit existing task (description, hours, category)
@@ -62,19 +62,19 @@ Enterprise Features:
   • Professional Distribution: One-liner installation
 
 Examples:
-  harvest add "Fix critical bug" 2.0
-  harvest tech "API development" 4.0
-  harvest meeting "Sprint planning" 1.5
-  harvest status
-  harvest report
-  harvest list --date 2025-07-21
-  harvest search "bug"
-  harvest export --format csv
+  workflow add "Fix critical bug" 2.0
+  workflow tech "API development" 4.0
+  workflow meeting "Sprint planning" 1.5
+  workflow status
+  workflow report
+  workflow list --date 2025-07-21
+  workflow search "bug"
+  workflow export --format csv
 
 Installation:
-  curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/lucasvidela94/workflow-cli/main/install-latest.sh | bash
 
-Use "harvest [command] --help" for more information about a command.
+Use "workflow [command] --help" for more information about a command.
 `)
 
 	// Comando de versión
@@ -137,7 +137,7 @@ Use "harvest [command] --help" for more information about a command.
 	reportCmd.Flags().Bool("month", false, "Generate monthly report")
 	reportCmd.Flags().String("category", "", "Filter by category")
 	reportCmd.Flags().String("status", "", "Filter by status (pending, in_progress, completed, paused)")
-	reportCmd.Flags().Bool("harvest", false, "Generate legacy Harvest format report")
+	reportCmd.Flags().Bool("workflow", false, "Generate legacy workflow format report")
 
 	// Agregar comando
 	rootCmd.AddCommand(searchCmd)
@@ -150,7 +150,7 @@ Use "harvest [command] --help" for more information about a command.
 var rollbackCmd = &cobra.Command{
 	Use:   "rollback",
 	Short: "Manage rollback operations",
-	Long: `Manage rollback operations for Harvest CLI.
+	Long: `Manage rollback operations for workflow CLI.
 
 This command allows you to:
 - Check rollback availability
@@ -222,7 +222,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🌾 Harvest CLI v1.0.1")
+		fmt.Println("🌾 workflow CLI v1.0.1")
 		fmt.Println("Built with Go")
 		fmt.Println("Migrated from Python to Go")
 	},
@@ -250,12 +250,12 @@ var addCmd = &cobra.Command{
 	Long: `Add a new task to your daily tracking.
 
 Examples:
-  harvest add "Fix bug" 2.0
-  harvest add "Development" 3.5 tech
-  harvest add "Meeting" 1.0 meeting
-  harvest add --date 2025-07-20 "Tarea del lunes" 3.0
-  harvest add --yesterday "Tarea olvidada" 2.0
-  harvest add --tomorrow "Planificación" 1.5`,
+  workflow add "Fix bug" 2.0
+  workflow add "Development" 3.5 tech
+  workflow add "Meeting" 1.0 meeting
+  workflow add --date 2025-07-20 "Tarea del lunes" 3.0
+  workflow add --yesterday "Tarea olvidada" 2.0
+  workflow add --tomorrow "Planificación" 1.5`,
 	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		description := args[0]
@@ -360,8 +360,8 @@ func showStatus(taskManager *core.TaskManager) {
 	if len(todayTasks) > 0 {
 		fmt.Println("\n📝 Today's tasks:")
 		for _, task := range todayTasks {
-			icon := harvest.GetIcon(task.Category)
-			statusIcon := harvest.GetStatusIcon(task.Status)
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
 			fmt.Printf("  [%d] %s %s - %.1fh (%s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}
 	}
@@ -412,8 +412,8 @@ func showDetailedStatus(taskManager *core.TaskManager) {
 	// Mostrar tareas
 	if len(todayTasks) > 0 {
 		for _, task := range todayTasks {
-			icon := harvest.GetIcon(task.Category)
-			statusIcon := harvest.GetStatusIcon(task.Status)
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
 			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}
 	} else {
@@ -447,8 +447,8 @@ var techCmd = &cobra.Command{
 	Long: `Add a technical task (development, coding, etc.).
 
 Examples:
-  harvest tech "Fix bug" 2.0
-  harvest tech "Development" 3.5`,
+  workflow tech "Fix bug" 2.0
+  workflow tech "Development" 3.5`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		description := args[0]
@@ -480,8 +480,8 @@ var meetingCmd = &cobra.Command{
 	Long: `Add a meeting task (team sync, planning, etc.).
 
 Examples:
-  harvest meeting "Team sync" 1.0
-  harvest meeting "Planning" 2.0`,
+  workflow meeting "Team sync" 1.0
+  workflow meeting "Planning" 2.0`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		description := args[0]
@@ -513,8 +513,8 @@ var qaCmd = &cobra.Command{
 	Long: `Add a QA/testing task (testing, quality assurance, etc.).
 
 Examples:
-  harvest qa "Testing" 1.5
-  harvest qa "Bug fixes" 2.0`,
+  workflow qa "Testing" 1.5
+  workflow qa "Bug fixes" 2.0`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		description := args[0]
@@ -573,20 +573,20 @@ var reportCmd = &cobra.Command{
 You can specify date ranges and filters to customize the report.
 
 Examples:
-  harvest report
-  harvest report --date 2025-07-21
-  harvest report --week
-  harvest report --month
-  harvest report --date 2025-07-21 --category tech
-  harvest report --status completed
-  harvest report --harvest (legacy format for Harvest app)`,
+  workflow report
+  workflow report --date 2025-07-21
+  workflow report --week
+  workflow report --month
+  workflow report --date 2025-07-21 --category tech
+  workflow report --status completed
+  workflow report --workflow (legacy format for workflow app)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dateFlag, _ := cmd.Flags().GetString("date")
 		weekFlag, _ := cmd.Flags().GetBool("week")
 		monthFlag, _ := cmd.Flags().GetBool("month")
 		categoryFlag, _ := cmd.Flags().GetString("category")
 		statusFlag, _ := cmd.Flags().GetString("status")
-		harvestFlag, _ := cmd.Flags().GetBool("harvest")
+		workflowFlag, _ := cmd.Flags().GetBool("workflow")
 
 		// Validar que solo se use un flag de período
 		periodFlagsCount := 0
@@ -605,11 +605,11 @@ Examples:
 			return
 		}
 
-		if harvestFlag {
-			// Formato legacy para Harvest
+		if workflowFlag {
+			// Formato legacy para workflow
 			taskManager := core.NewTaskManagerSQLite()
 			defer taskManager.Close()
-			generateHarvestReport(taskManager)
+			generateworkflowReport(taskManager)
 		} else {
 			// Nuevo formato detallado
 			performDetailedReport(dateFlag, weekFlag, monthFlag, categoryFlag, statusFlag)
@@ -617,8 +617,8 @@ Examples:
 	},
 }
 
-// generateHarvestReport genera el reporte legacy para Harvest
-func generateHarvestReport(taskManager *core.TaskManagerSQLite) {
+// generateworkflowReport genera el reporte legacy para workflow
+func generateworkflowReport(taskManager *core.TaskManagerSQLite) {
 	todayTasks, err := taskManager.GetTodayTasks()
 	if err != nil {
 		printError(err)
@@ -632,10 +632,10 @@ func generateHarvestReport(taskManager *core.TaskManagerSQLite) {
 
 	totalHours := taskManager.GetTotalHours(todayTasks)
 
-	fmt.Printf("📋 Harvest Report for %s\n", time.Now().Format("2006-01-02"))
+	fmt.Printf("📋 workflow Report for %s\n", time.Now().Format("2006-01-02"))
 	fmt.Printf("Total hours: %.2fh\n\n", totalHours)
 
-	fmt.Println("Copy the following lines to Harvest:")
+	fmt.Println("Copy the following lines to workflow:")
 	fmt.Println(strings.Repeat("─", 50))
 
 	for _, task := range todayTasks {
@@ -657,7 +657,7 @@ func performDetailedReport(date string, week bool, month bool, category string, 
 	taskManager := core.NewTaskManagerSQLite()
 	defer taskManager.Close()
 
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 	var err error
 
 	// Determinar período del reporte
@@ -679,7 +679,7 @@ func performDetailedReport(date string, week bool, month bool, category string, 
 			return
 		}
 		// Filtrar por semana
-		var weekTasks []harvest.Task
+		var weekTasks []workflow.Task
 		for _, task := range tasks {
 			if task.Date >= startDate && task.Date <= endDate {
 				weekTasks = append(weekTasks, task)
@@ -696,7 +696,7 @@ func performDetailedReport(date string, week bool, month bool, category string, 
 			return
 		}
 		// Filtrar por mes
-		var monthTasks []harvest.Task
+		var monthTasks []workflow.Task
 		for _, task := range tasks {
 			if task.Date >= startDate && task.Date <= endDate {
 				monthTasks = append(monthTasks, task)
@@ -716,7 +716,7 @@ func performDetailedReport(date string, week bool, month bool, category string, 
 }
 
 // generateDateReport genera reporte para una fecha específica
-func generateDateReport(date string, tasks []harvest.Task, category string, status string) {
+func generateDateReport(date string, tasks []workflow.Task, category string, status string) {
 	fmt.Printf("📊 Report for %s\n", date)
 	fmt.Printf("%s\n", strings.Repeat("=", 50))
 
@@ -726,7 +726,7 @@ func generateDateReport(date string, tasks []harvest.Task, category string, stat
 	}
 
 	// Aplicar filtros
-	var filteredTasks []harvest.Task
+	var filteredTasks []workflow.Task
 	for _, task := range tasks {
 		if category != "" && task.Category != category {
 			continue
@@ -747,11 +747,11 @@ func generateDateReport(date string, tasks []harvest.Task, category string, stat
 	for _, task := range filteredTasks {
 		fmt.Printf("[%d] %s %s (%.1fh, %s) %s\n",
 			task.ID,
-			harvest.GetIcon(task.Category),
+			workflow.GetIcon(task.Category),
 			task.Description,
 			task.Hours,
 			task.Category,
-			harvest.GetStatusIcon(task.Status))
+			workflow.GetStatusIcon(task.Status))
 	}
 
 	// Estadísticas
@@ -764,7 +764,7 @@ func generateDateReport(date string, tasks []harvest.Task, category string, stat
 		totalHours += task.Hours
 		categoryStats[task.Category] += task.Hours
 
-		if task.Status == harvest.StatusCompleted {
+		if task.Status == workflow.StatusCompleted {
 			completedHours += task.Hours
 		} else {
 			pendingHours += task.Hours
@@ -785,7 +785,7 @@ func generateDateReport(date string, tasks []harvest.Task, category string, stat
 }
 
 // generateWeekReport genera reporte semanal
-func generateWeekReport(startDate, endDate string, tasks []harvest.Task, category string, status string) {
+func generateWeekReport(startDate, endDate string, tasks []workflow.Task, category string, status string) {
 	fmt.Printf("📊 Weekly Report (%s to %s)\n", startDate, endDate)
 	fmt.Printf("%s\n", strings.Repeat("=", 50))
 
@@ -795,7 +795,7 @@ func generateWeekReport(startDate, endDate string, tasks []harvest.Task, categor
 	}
 
 	// Agrupar por fecha
-	dateGroups := make(map[string][]harvest.Task)
+	dateGroups := make(map[string][]workflow.Task)
 	for _, task := range tasks {
 		dateGroups[task.Date] = append(dateGroups[task.Date], task)
 	}
@@ -808,11 +808,11 @@ func generateWeekReport(startDate, endDate string, tasks []harvest.Task, categor
 			for _, task := range dayTasks {
 				fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n",
 					task.ID,
-					harvest.GetIcon(task.Category),
+					workflow.GetIcon(task.Category),
 					task.Description,
 					task.Hours,
 					task.Category,
-					harvest.GetStatusIcon(task.Status))
+					workflow.GetStatusIcon(task.Status))
 				totalDayHours += task.Hours
 			}
 			fmt.Printf("  Total: %.1fh\n", totalDayHours)
@@ -827,7 +827,7 @@ func generateWeekReport(startDate, endDate string, tasks []harvest.Task, categor
 	for _, task := range tasks {
 		totalHours += task.Hours
 		categoryStats[task.Category] += task.Hours
-		if task.Status == harvest.StatusCompleted {
+		if task.Status == workflow.StatusCompleted {
 			completedHours += task.Hours
 		}
 	}
@@ -846,7 +846,7 @@ func generateWeekReport(startDate, endDate string, tasks []harvest.Task, categor
 }
 
 // generateMonthReport genera reporte mensual
-func generateMonthReport(startDate, endDate string, tasks []harvest.Task, category string, status string) {
+func generateMonthReport(startDate, endDate string, tasks []workflow.Task, category string, status string) {
 	fmt.Printf("📊 Monthly Report (%s to %s)\n", startDate, endDate)
 	fmt.Printf("%s\n", strings.Repeat("=", 50))
 
@@ -866,7 +866,7 @@ func generateMonthReport(startDate, endDate string, tasks []harvest.Task, catego
 		categoryStats[task.Category] += task.Hours
 		statusStats[task.Status]++
 
-		if task.Status == harvest.StatusCompleted {
+		if task.Status == workflow.StatusCompleted {
 			completedHours += task.Hours
 		}
 	}
@@ -926,7 +926,7 @@ func addDays(date string, days int) string {
 }
 
 // copyToClipboard intenta copiar el reporte al portapapeles
-func copyToClipboard(tasks []harvest.Task) error {
+func copyToClipboard(tasks []workflow.Task) error {
 	// Construir el texto del reporte
 	var reportText strings.Builder
 	for _, task := range tasks {
@@ -947,11 +947,11 @@ func copyToClipboard(tasks []harvest.Task) error {
 	return nil
 }
 
-// upgradeCmd es el comando para actualizar Harvest CLI
+// upgradeCmd es el comando para actualizar workflow CLI
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
 	Short: "Upgrade to latest version",
-	Long: `Upgrade Harvest CLI to the latest version.
+	Long: `Upgrade workflow CLI to the latest version.
 
 This command will:
 1. Check for available updates
@@ -1070,8 +1070,8 @@ var listCmd = &cobra.Command{
 	Long: `List all tasks for a given date (default: today).
 
 Examples:
-  harvest list
-  harvest list --date 2025-07-20
+  workflow list
+  workflow list --date 2025-07-20
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		taskManager := core.NewTaskManagerSQLite()
@@ -1091,8 +1091,8 @@ Examples:
 			return
 		}
 		for _, task := range tasks {
-			icon := harvest.GetIcon(task.Category)
-			statusIcon := harvest.GetStatusIcon(task.Status)
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
 			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}
 	},
@@ -1105,10 +1105,10 @@ var editCmd = &cobra.Command{
 	Long: `Edit an existing task by its ID.
 
 Examples:
-  harvest edit 1 --description "New description"
-  harvest edit 2 --hours 3.5
-  harvest edit 3 --category tech
-  harvest edit 1 --description "New desc" --hours 2.0 --category meeting
+  workflow edit 1 --description "New description"
+  workflow edit 2 --hours 3.5
+  workflow edit 3 --category tech
+  workflow edit 1 --description "New desc" --hours 2.0 --category meeting
 `,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -1129,7 +1129,7 @@ Examples:
 		}
 
 		// Mostrar información actual
-		icon := harvest.GetIcon(task.Category)
+		icon := workflow.GetIcon(task.Category)
 		fmt.Printf("✏️  Editing task:\n")
 		fmt.Printf("[%d] %s %s (%.1fh, %s)\n\n", task.ID, icon, task.Description, task.Hours, task.Category)
 
@@ -1159,7 +1159,7 @@ Examples:
 		// Mostrar la tarea actualizada
 		updatedTask, _ := taskManager.GetTaskByID(id)
 		if updatedTask != nil {
-			icon := harvest.GetIcon(updatedTask.Category)
+			icon := workflow.GetIcon(updatedTask.Category)
 			fmt.Printf("Updated: [%d] %s %s (%.1fh, %s)\n",
 				updatedTask.ID, icon, updatedTask.Description, updatedTask.Hours, updatedTask.Category)
 		}
@@ -1173,8 +1173,8 @@ var deleteCmd = &cobra.Command{
 	Long: `Delete an existing task by its ID.
 
 Examples:
-  harvest delete 1
-  harvest delete 2 --force
+  workflow delete 1
+  workflow delete 2 --force
 `,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -1195,8 +1195,8 @@ Examples:
 		}
 
 		// Mostrar información de la tarea a eliminar
-		icon := harvest.GetIcon(task.Category)
-		fmt.Printf("🗑️  Deleting task:\n")
+		icon := workflow.GetIcon(task.Category)
+		fmt.Printf("️  Deleting task:\n")
 		fmt.Printf("[%d] %s %s (%.1fh, %s)\n\n", task.ID, icon, task.Description, task.Hours, task.Category)
 
 		// Verificar si se debe forzar la eliminación
@@ -1231,8 +1231,8 @@ var completeCmd = &cobra.Command{
 	Long: `Mark an existing task as completed by its ID.
 
 Examples:
-  harvest complete 1
-  harvest complete 2 --force
+  workflow complete 1
+  workflow complete 2 --force
 `,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -1253,14 +1253,14 @@ Examples:
 		}
 
 		// Verificar si ya está completada
-		if task.Status == harvest.StatusCompleted {
+		if task.Status == workflow.StatusCompleted {
 			printInfo(fmt.Sprintf("Task %d is already completed", id))
 			return
 		}
 
 		// Mostrar información de la tarea a completar
-		icon := harvest.GetIcon(task.Category)
-		statusIcon := harvest.GetStatusIcon(task.Status)
+		icon := workflow.GetIcon(task.Category)
+		statusIcon := workflow.GetStatusIcon(task.Status)
 		fmt.Printf("✅ Completing task:\n")
 		fmt.Printf("[%d] %s %s (%.1fh, %s) %s\n\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 
@@ -1296,11 +1296,11 @@ var searchCmd = &cobra.Command{
 	Long: `Search tasks using various criteria.
 
 Examples:
-  harvest search "bug"
-  harvest search "meeting" --category meeting
-  harvest search "" --status completed
-  harvest search "development" --category tech --status pending
-  harvest search "test" --date 2025-07-21
+  workflow search "bug"
+  workflow search "meeting" --category meeting
+  workflow search "" --status completed
+  workflow search "development" --category tech --status pending
+  workflow search "test" --date 2025-07-21
 `,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -1357,8 +1357,8 @@ Examples:
 				fmt.Printf("\n📅 %s:\n", currentDate)
 			}
 
-			icon := harvest.GetIcon(task.Category)
-			statusIcon := harvest.GetStatusIcon(task.Status)
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
 			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n",
 				task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de desinstalación para Harvest CLI
+# Script de desinstalación para workflow CLI
 # Remueve el binario y limpia la configuración
 
 set -e
@@ -85,16 +85,16 @@ remove_from_path() {
         # Crear backup del archivo
         cp "$shell_rc" "$shell_rc.backup"
         
-        # Remover líneas relacionadas con Harvest (de forma más segura)
-        if grep -q "harvest" "$shell_rc"; then
-            # Remover líneas que contengan alias de harvest
-            sed -i '/alias harvest=/d' "$shell_rc"
+        # Remover líneas relacionadas con workflow (de forma más segura)
+        if grep -q "workflow" "$shell_rc"; then
+            # Remover líneas que contengan alias de workflow
+            sed -i '/alias workflow=/d' "$shell_rc"
             sed -i '/alias finish=/d' "$shell_rc"
             sed -i '/alias week=/d' "$shell_rc"
             
             print_success "Removido del PATH en $shell_rc"
         else
-            print_info "No se encontraron configuraciones de Harvest en $shell_rc"
+            print_info "No se encontraron configuraciones de workflow en $shell_rc"
         fi
     else
         print_warning "No se pudo encontrar archivo de configuración del shell"
@@ -105,10 +105,10 @@ remove_from_path() {
 # Función para limpiar datos
 cleanup_data() {
     local home_dir="$HOME"
-    local data_dir="$home_dir/.harvest"
+    local data_dir="$home_dir/.workflow"
     
     if [[ -d "$data_dir" ]]; then
-        print_warning "¿Deseas eliminar todos los datos de Harvest? (y/N)"
+        print_warning "¿Deseas eliminar todos los datos de workflow? (y/N)"
         read -r response
         if [[ "$response" =~ ^[Yy]$ ]]; then
             rm -rf "$data_dir"
@@ -121,30 +121,30 @@ cleanup_data() {
 
 # Función principal de desinstalación
 main() {
-    print_info "🗑️  Desinstalando Harvest CLI..."
+    print_info "🗑️  Desinstalando workflow CLI..."
     
     # Obtener ruta de instalación
     local install_dir=$(get_install_path)
-    local install_path="$install_dir/harvest"
+    local install_path="$install_dir/workflow"
     
     # Verificar si está instalado
     if [[ ! -f "$install_path" ]]; then
-        print_warning "Harvest CLI no está instalado en $install_path"
+        print_warning "workflow CLI no está instalado en $install_path"
         print_info "Buscando en otras ubicaciones..."
         
         # Buscar en PATH
-        if command -v harvest >/dev/null 2>&1; then
-            local found_path=$(which harvest)
+        if command -v workflow >/dev/null 2>&1; then
+            local found_path=$(which workflow)
             print_info "Encontrado en: $found_path"
             install_path="$found_path"
         else
-            print_error "Harvest CLI no encontrado en el sistema"
+            print_error "workflow CLI no encontrado en el sistema"
             exit 1
         fi
     fi
     
     # Confirmar desinstalación
-    print_warning "¿Estás seguro de que quieres desinstalar Harvest CLI? (y/N)"
+    print_warning "¿Estás seguro de que quieres desinstalar workflow CLI? (y/N)"
     read -r response
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
         print_info "Desinstalación cancelada"

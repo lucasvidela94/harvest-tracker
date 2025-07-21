@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Harvest CLI - Instalador Automático
-# Descarga e instala la última versión de Harvest CLI
+# workflow CLI - Instalador Automático
+# Descarga e instala la última versión de workflow CLI
 
 set -e
 
@@ -13,10 +13,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuración
-REPO="lucasvidela94/harvest-tracker"
+REPO="lucasvidela94/workflow-cli"
 LATEST_VERSION=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-echo -e "${BLUE}🚀 Harvest CLI - Instalador Automático${NC}"
+echo -e "${BLUE}🚀 workflow CLI - Instalador Automático${NC}"
 echo -e "${YELLOW}Versión a instalar: $LATEST_VERSION${NC}"
 
 # Detectar plataforma
@@ -47,7 +47,7 @@ else
 fi
 
 # URL del release
-RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/harvest-$LATEST_VERSION-$OS-$ARCH.$EXT"
+RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$LATEST_VERSION-$OS-$ARCH.$EXT"
 
 echo -e "${BLUE}📦 Descargando desde: $RELEASE_URL${NC}"
 
@@ -57,34 +57,34 @@ cd "$TEMP_DIR"
 
 # Descargar release
 echo -e "${YELLOW}⬇️  Descargando...${NC}"
-curl -L -o "harvest.$EXT" "$RELEASE_URL"
+curl -L -o "workflow.$EXT" "$RELEASE_URL"
 
 # Verificar checksum (opcional)
 echo -e "${YELLOW}🔐 Verificando integridad...${NC}"
-curl -L -o "checksums.txt" "https://github.com/$REPO/releases/download/$LATEST_VERSION/harvest-$LATEST_VERSION-checksums.txt"
+curl -L -o "checksums.txt" "https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$LATEST_VERSION-checksums.txt"
 if command -v sha256sum >/dev/null 2>&1; then
     sha256sum -c checksums.txt --ignore-missing || echo -e "${YELLOW}⚠️  Advertencia: No se pudo verificar checksum${NC}"
 fi
 
 # Extraer
 echo -e "${YELLOW}📁 Extrayendo...${NC}"
-tar -xzf "harvest.$EXT"
+tar -xzf "workflow.$EXT"
 
 # Instalar
 echo -e "${YELLOW}🔧 Instalando...${NC}"
-sudo mv "harvest-$LATEST_VERSION-$OS-$ARCH/harvest" /usr/local/bin/harvest
-sudo chmod +x /usr/local/bin/harvest
+sudo mv "workflow-$LATEST_VERSION-$OS-$ARCH/workflow" /usr/local/bin/workflow
+sudo chmod +x /usr/local/bin/workflow
 
 # Limpiar
 cd /
 rm -rf "$TEMP_DIR"
 
 # Verificar instalación
-if command -v harvest >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ ¡Harvest CLI instalado exitosamente!${NC}"
+if command -v workflow >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ ¡workflow CLI instalado exitosamente!${NC}"
     echo -e "${BLUE}📋 Versión instalada:${NC}"
-    harvest version
-    echo -e "${BLUE}💡 Para ver ayuda: harvest --help${NC}"
+    workflow version
+    echo -e "${BLUE}💡 Para ver ayuda: workflow --help${NC}"
 else
     echo -e "${RED}❌ Error en la instalación${NC}"
     exit 1

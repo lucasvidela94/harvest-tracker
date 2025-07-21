@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 )
 
 // TaskManager maneja las operaciones de tareas
@@ -33,7 +33,7 @@ func NewTaskManager() *TaskManager {
 }
 
 // LoadTasks carga las tareas desde el archivo JSON
-func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
+func (tm *TaskManager) LoadTasks() ([]workflow.Task, error) {
 	// Crear directorio si no existe
 	dir := filepath.Dir(tm.dataFile)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -42,7 +42,7 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 
 	// Si el archivo no existe, crear uno vacío
 	if _, err := os.Stat(tm.dataFile); os.IsNotExist(err) {
-		emptyTasks := []harvest.Task{}
+		emptyTasks := []workflow.Task{}
 		if err := tm.SaveTasks(emptyTasks); err != nil {
 			return nil, fmt.Errorf("could not create empty tasks file: %v", err)
 		}
@@ -58,7 +58,7 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 
 	// Usar un decoder personalizado para manejar diferentes formatos de fecha
 	decoder := json.NewDecoder(file)
-	var tasks []harvest.Task
+	var tasks []workflow.Task
 
 	// Decodificar como array de mapas primero
 	var rawTasks []map[string]interface{}
@@ -68,7 +68,7 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 
 	// Convertir cada tarea
 	for _, rawTask := range rawTasks {
-		task := harvest.Task{}
+		task := workflow.Task{}
 
 		// ID
 		if id, ok := rawTask["id"].(float64); ok {
@@ -99,7 +99,7 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 		if status, ok := rawTask["status"].(string); ok {
 			task.Status = status
 		} else {
-			task.Status = harvest.StatusPending // Valor por defecto para tareas existentes
+			task.Status = workflow.StatusPending // Valor por defecto para tareas existentes
 		}
 
 		// CreatedAt - manejar diferentes formatos
@@ -138,7 +138,7 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 }
 
 // SaveTasks guarda las tareas en el archivo JSON
-func (tm *TaskManager) SaveTasks(tasks []harvest.Task) error {
+func (tm *TaskManager) SaveTasks(tasks []workflow.Task) error {
 	// Crear directorio si no existe
 	dir := filepath.Dir(tm.dataFile)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -186,13 +186,13 @@ func (tm *TaskManager) AddTask(description string, hours float64, category strin
 	}
 
 	// Crear nueva tarea
-	newTask := harvest.Task{
+	newTask := workflow.Task{
 		ID:          newID,
 		Description: description,
 		Hours:       hours,
 		Category:    category,
 		Date:        taskDate,
-		Status:      harvest.StatusPending,
+		Status:      workflow.StatusPending,
 		CreatedAt:   time.Now(),
 	}
 
@@ -278,7 +278,7 @@ func (tm *TaskManager) DeleteTask(id int) error {
 }
 
 // GetTaskByID obtiene una tarea específica por ID
-func (tm *TaskManager) GetTaskByID(id int) (*harvest.Task, error) {
+func (tm *TaskManager) GetTaskByID(id int) (*workflow.Task, error) {
 	tasks, err := tm.LoadTasks()
 	if err != nil {
 		return nil, fmt.Errorf("could not load tasks: %v", err)
@@ -294,14 +294,14 @@ func (tm *TaskManager) GetTaskByID(id int) (*harvest.Task, error) {
 }
 
 // GetTodayTasks obtiene las tareas del día actual
-func (tm *TaskManager) GetTodayTasks() ([]harvest.Task, error) {
+func (tm *TaskManager) GetTodayTasks() ([]workflow.Task, error) {
 	tasks, err := tm.LoadTasks()
 	if err != nil {
 		return nil, err
 	}
 
 	today := time.Now().Format("2006-01-02")
-	var todayTasks []harvest.Task
+	var todayTasks []workflow.Task
 
 	for _, task := range tasks {
 		if task.Date == today {
@@ -313,7 +313,7 @@ func (tm *TaskManager) GetTodayTasks() ([]harvest.Task, error) {
 }
 
 // GetTotalHours calcula el total de horas de una lista de tareas
-func (tm *TaskManager) GetTotalHours(tasks []harvest.Task) float64 {
+func (tm *TaskManager) GetTotalHours(tasks []workflow.Task) float64 {
 	total := 0.0
 	for _, task := range tasks {
 		total += task.Hours
@@ -332,13 +332,13 @@ func (tm *TaskManager) GetDailyStandupHours() float64 {
 }
 
 // GetTasksByDate obtiene las tareas de una fecha específica
-func (tm *TaskManager) GetTasksByDate(date string) ([]harvest.Task, error) {
+func (tm *TaskManager) GetTasksByDate(date string) ([]workflow.Task, error) {
 	tasks, err := tm.LoadTasks()
 	if err != nil {
 		return nil, err
 	}
 
-	var filteredTasks []harvest.Task
+	var filteredTasks []workflow.Task
 	for _, task := range tasks {
 		if task.Date == date {
 			filteredTasks = append(filteredTasks, task)
@@ -368,7 +368,7 @@ func (tm *TaskManager) CompleteTask(id int) error {
 	}
 
 	// Marcar como completada
-	tasks[taskIndex].Status = harvest.StatusCompleted
+	tasks[taskIndex].Status = workflow.StatusCompleted
 
 	// Guardar cambios
 	if err := tm.SaveTasks(tasks); err != nil {
@@ -399,7 +399,7 @@ func (tm *TaskManager) UpdateTaskStatus(id int, status string) error {
 	}
 
 	// Validar estado
-	validStatuses := []string{harvest.StatusPending, harvest.StatusInProgress, harvest.StatusCompleted, harvest.StatusPaused}
+	validStatuses := []string{workflow.StatusPending, workflow.StatusInProgress, workflow.StatusCompleted, workflow.StatusPaused}
 	isValid := false
 	for _, validStatus := range validStatuses {
 		if status == validStatus {
@@ -424,13 +424,13 @@ func (tm *TaskManager) UpdateTaskStatus(id int, status string) error {
 }
 
 // SearchTasks busca tareas según criterios específicos
-func (tm *TaskManager) SearchTasks(query string, category string, status string, date string) ([]harvest.Task, error) {
+func (tm *TaskManager) SearchTasks(query string, category string, status string, date string) ([]workflow.Task, error) {
 	tasks, err := tm.LoadTasks()
 	if err != nil {
 		return nil, err
 	}
 
-	var filteredTasks []harvest.Task
+	var filteredTasks []workflow.Task
 
 	for _, task := range tasks {
 		// Filtro por texto (descripción)

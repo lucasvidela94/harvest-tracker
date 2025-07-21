@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test de producción exhaustivo para Harvest CLI
+# Test de producción exhaustivo para workflow CLI
 # Simula un día completo de uso real
 
 # Colores para output
@@ -37,12 +37,12 @@ check_exit() {
     fi
 }
 
-echo "🏭 Test de Producción - Harvest CLI"
+echo "🏭 Test de Producción - workflow CLI"
 echo "=================================="
 
 # Configurar entorno de test
-export HARVEST_TEST_MODE=1
-TEST_DIR="/tmp/harvest-production-test"
+export workflow_TEST_MODE=1
+TEST_DIR="/tmp/workflow-production-test"
 mkdir -p "$TEST_DIR"
 cd "$TEST_DIR"
 
@@ -66,78 +66,78 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Test 2: Verificar versión y ayuda
 print_info "Test 2: Verificar versión y ayuda"
-harvest version
-check_exit "harvest version"
+workflow version
+check_exit "workflow version"
 
-harvest --help
-check_exit "harvest --help"
+workflow --help
+check_exit "workflow --help"
 
 # Test 3: Simular día completo de trabajo
 print_info "Test 3: Simular día completo de trabajo"
 
 # 9:00 AM - Daily standup
 print_info "9:00 AM - Daily standup"
-harvest daily
-check_exit "harvest daily"
+workflow daily
+check_exit "workflow daily"
 
 # 9:30 AM - Agregar tareas planificadas
 print_info "9:30 AM - Agregar tareas planificadas"
-harvest add "Revisar PRs pendientes" 1.0
-check_exit "harvest add PRs"
+workflow add "Revisar PRs pendientes" 1.0
+check_exit "workflow add PRs"
 
-harvest add "Desarrollar feature de login" 3.0
-check_exit "harvest add desarrollo"
+workflow add "Desarrollar feature de login" 3.0
+check_exit "workflow add desarrollo"
 
-harvest add "Reunión de planning" 1.5
-check_exit "harvest add reunión"
+workflow add "Reunión de planning" 1.5
+check_exit "workflow add reunión"
 
 # Verificar estado inicial
 print_info "Verificar estado inicial"
-harvest status
-check_exit "harvest status inicial"
+workflow status
+check_exit "workflow status inicial"
 
 # 11:00 AM - Completar daily y agregar tarea urgente
 print_info "11:00 AM - Completar daily y agregar tarea urgente"
-echo "y" | harvest complete 1
-check_exit "harvest complete daily"
+echo "y" | workflow complete 1
+check_exit "workflow complete daily"
 
-harvest add "Fix bug crítico en producción" 2.0
-check_exit "harvest add bug urgente"
+workflow add "Fix bug crítico en producción" 2.0
+check_exit "workflow add bug urgente"
 
 # 1:00 PM - Revisión y ajustes
 print_info "1:00 PM - Revisión y ajustes"
-harvest list
-check_exit "harvest list"
+workflow list
+check_exit "workflow list"
 
 # Editar tarea
-harvest edit 5 --hours 1.5
-check_exit "harvest edit horas"
+workflow edit 5 --hours 1.5
+check_exit "workflow edit horas"
 
-harvest edit 5 --description "Fix bug crítico en API de usuarios"
-check_exit "harvest edit descripción"
+workflow edit 5 --description "Fix bug crítico en API de usuarios"
+check_exit "workflow edit descripción"
 
 # 3:00 PM - Progreso
 print_info "3:00 PM - Progreso"
-echo "y" | harvest complete 2
-check_exit "harvest complete PRs"
+echo "y" | workflow complete 2
+check_exit "workflow complete PRs"
 
-harvest add "Documentar nueva API" 1.0
-check_exit "harvest add documentación"
+workflow add "Documentar nueva API" 1.0
+check_exit "workflow add documentación"
 
 # Duplicar tarea para mañana (usar una tarea que existe)
-harvest duplicate 3 --tomorrow
-check_exit "harvest duplicate"
+workflow duplicate 3 --tomorrow
+check_exit "workflow duplicate"
 
 # 5:00 PM - Finalizar día
 print_info "5:00 PM - Finalizar día"
-echo "y" | harvest complete 3
-check_exit "harvest complete desarrollo"
+echo "y" | workflow complete 3
+check_exit "workflow complete desarrollo"
 
-echo "y" | harvest complete 4
-check_exit "harvest complete reunión"
+echo "y" | workflow complete 4
+check_exit "workflow complete reunión"
 
-echo "y" | harvest complete 5
-check_exit "harvest complete bug"
+echo "y" | workflow complete 5
+check_exit "workflow complete bug"
 
 # Test 4: Reportes y exportación
 print_info "Test 4: Reportes y exportación"
@@ -148,67 +148,67 @@ print_info "Usando fecha actual: $CURRENT_DATE"
 
 # Verificar que las tareas se crearon correctamente
 print_info "Verificando tareas creadas..."
-harvest list
+workflow list
 
 # Reporte del día (sin filtros de fecha)
-harvest report --date "$CURRENT_DATE"
-check_exit "harvest report"
+workflow report --date "$CURRENT_DATE"
+check_exit "workflow report"
 
-# Reporte para Harvest
-harvest report --harvest --date "$CURRENT_DATE"
-check_exit "harvest report --harvest"
+# Reporte para workflow
+workflow report --workflow --date "$CURRENT_DATE"
+check_exit "workflow report --workflow"
 
 # Exportar a CSV
-harvest export --format csv --output dia-completo.csv --date "$CURRENT_DATE"
-check_exit "harvest export csv"
+workflow export --format csv --output dia-completo.csv --date "$CURRENT_DATE"
+check_exit "workflow export csv"
 
 # Exportar a JSON
-harvest export --format json --output dia-completo.json --date "$CURRENT_DATE"
-check_exit "harvest export json"
+workflow export --format json --output dia-completo.json --date "$CURRENT_DATE"
+check_exit "workflow export json"
 
 # Test 5: Búsqueda y filtros
 print_info "Test 5: Búsqueda y filtros"
-harvest search "bug"
-check_exit "harvest search bug"
+workflow search "bug"
+check_exit "workflow search bug"
 
-harvest search --category general
-check_exit "harvest search --category"
+workflow search --category general
+check_exit "workflow search --category"
 
-harvest search --status completed
-check_exit "harvest search --status"
+workflow search --status completed
+check_exit "workflow search --status"
 
 # Test 6: Tareas con fechas específicas
 print_info "Test 6: Tareas con fechas específicas"
-harvest add "Tarea de ayer" 1.0 --yesterday
-check_exit "harvest add --yesterday"
+workflow add "Tarea de ayer" 1.0 --yesterday
+check_exit "workflow add --yesterday"
 
-harvest add "Tarea de mañana" 1.0 --tomorrow
-check_exit "harvest add --tomorrow"
+workflow add "Tarea de mañana" 1.0 --tomorrow
+check_exit "workflow add --tomorrow"
 
-harvest add "Tarea específica" 1.0 --date 2025-07-20
-check_exit "harvest add --date"
+workflow add "Tarea específica" 1.0 --date 2025-07-20
+check_exit "workflow add --date"
 
 # Test 7: Categorías específicas
 print_info "Test 7: Categorías específicas"
-harvest tech "Refactorización de módulo" 2.0
-check_exit "harvest tech"
+workflow tech "Refactorización de módulo" 2.0
+check_exit "workflow tech"
 
-harvest meeting "Reunión de equipo" 1.0
-check_exit "harvest meeting"
+workflow meeting "Reunión de equipo" 1.0
+check_exit "workflow meeting"
 
-harvest qa "Testing de regresión" 1.5
-check_exit "harvest qa"
+workflow qa "Testing de regresión" 1.5
+check_exit "workflow qa"
 
 # Test 8: Reportes avanzados
 print_info "Test 8: Reportes avanzados"
-harvest report --week
-check_exit "harvest report --week"
+workflow report --week
+check_exit "workflow report --week"
 
-harvest report --category tech
-check_exit "harvest report --category"
+workflow report --category tech
+check_exit "workflow report --category"
 
-harvest report --status pending
-check_exit "harvest report --status"
+workflow report --status pending
+check_exit "workflow report --status"
 
 # Test 9: Verificar archivos generados
 print_info "Test 9: Verificar archivos generados"
@@ -228,17 +228,17 @@ fi
 
 # Test 10: Verificar estructura de datos
 print_info "Test 10: Verificar estructura de datos"
-if [ -d "$HOME/.harvest" ]; then
-    print_success "Directorio .harvest existe"
-    ls -la "$HOME/.harvest/"
+if [ -d "$HOME/.workflow" ]; then
+    print_success "Directorio .workflow existe"
+    ls -la "$HOME/.workflow/"
 else
-    print_error "Directorio .harvest no existe"
+    print_error "Directorio .workflow no existe"
 fi
 
-if [ -f "$HOME/.harvest/tasks.db" ]; then
+if [ -f "$HOME/.workflow/tasks.db" ]; then
     print_success "Base de datos SQLite existe"
     # Verificar que podemos leer la base de datos
-    sqlite3 "$HOME/.harvest/tasks.db" "SELECT COUNT(*) FROM tasks;" 2>/dev/null
+    sqlite3 "$HOME/.workflow/tasks.db" "SELECT COUNT(*) FROM tasks;" 2>/dev/null
     check_exit "Lectura de base de datos SQLite"
 else
     print_error "Base de datos SQLite no existe"
@@ -247,13 +247,13 @@ fi
 # Test 11: Verificar tareas de mañana
 print_info "Test 11: Verificar tareas de mañana"
 TOMORROW_DATE=$(date -d "tomorrow" +%Y-%m-%d)
-harvest list --date "$TOMORROW_DATE"
-check_exit "harvest list --date tomorrow"
+workflow list --date "$TOMORROW_DATE"
+check_exit "workflow list --date tomorrow"
 
 # Test 12: Estado final
 print_info "Test 12: Estado final"
-harvest status
-check_exit "harvest status final"
+workflow status
+check_exit "workflow status final"
 
 echo ""
 echo "🎉 Test de Producción Completado!"

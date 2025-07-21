@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/lucasvidela94/harvest-cli/internal/core"
-	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
+	"github.com/lucasvidela94/workflow-cli/pkg/workflow"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +23,9 @@ This command will:
 4. Verify the migration was successful
 
 Examples:
-  harvest migrate
-  harvest migrate --dry-run
-  harvest migrate --backup-only
+  workflow migrate
+  workflow migrate --dry-run
+  workflow migrate --backup-only
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -59,7 +59,7 @@ func performDryRunMigration() {
 
 	fmt.Printf("📊 Found %d tasks in JSON format\n", len(tasks))
 	fmt.Println("✅ Dry run completed successfully!")
-	fmt.Println("📝 To perform actual migration, run: harvest migrate")
+	fmt.Println("📝 To perform actual migration, run: workflow migrate")
 }
 
 // performBackupOnly crea solo un backup del archivo JSON
@@ -124,7 +124,7 @@ func performMigration() {
 	migratedCount := 0
 	for _, task := range tasks {
 		// Crear nueva tarea en SQLite
-		newTask := &harvest.Task{
+		newTask := &workflow.Task{
 			Description: task.Description,
 			Hours:       task.Hours,
 			Category:    task.Category,
@@ -162,7 +162,7 @@ func performMigration() {
 
 func getJSONDataPath() string {
 	homeDir, _ := os.UserHomeDir()
-	return filepath.Join(homeDir, ".harvest", "tasks.json")
+	return filepath.Join(homeDir, ".workflow", "tasks.json")
 }
 
 func copyFile(src, dst string) error {

@@ -1,9 +1,9 @@
-# 🌾 Harvest CLI
+# 🔄 Workflow CLI
 
-**Una herramienta de línea de comandos enterprise para el seguimiento de tareas y generación de reportes para Harvest.**
+**Una herramienta de línea de comandos enterprise para el seguimiento de tareas y gestión de workflows productivos.**
 
-[![Release](https://img.shields.io/github/v/release/lucasvidela94/harvest-tracker)](https://github.com/lucasvidela94/harvest-tracker/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lucasvidela94/harvest-tracker)](https://goreportcard.com/report/github.com/lucasvidela94/harvest-tracker)
+[![Release](https://img.shields.io/github/v/release/lucasvidela94/workflow-cli)](https://github.com/lucasvidela94/workflow-cli/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lucasvidela94/workflow-cli)](https://goreportcard.com/report/github.com/lucasvidela94/workflow-cli)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > **✨ Proyecto completamente migrado a Go** - Mejor rendimiento, mantenibilidad y distribución multiplataforma.
@@ -13,23 +13,23 @@
 ### **Instalación Automática (Recomendada)**
 ```bash
 # Instalar la última versión automáticamente
-curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash
+curl -fsSL https://raw.githubusercontent.com/lucasvidela94/workflow-cli/main/install-latest.sh | bash
 ```
 
 ### **Instalación Manual**
 ```bash
 # Descargar para tu plataforma
-wget https://github.com/lucasvidela94/harvest-tracker/releases/latest/download/harvest-$(curl -s https://api.github.com/repos/lucasvidela94/harvest-tracker/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz
+wget https://github.com/lucasvidela94/workflow-cli/releases/latest/download/workflow-$(curl -s https://api.github.com/repos/lucasvidela94/workflow-cli/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz
 
 # Extraer e instalar
-tar -xzf harvest-*.tar.gz
-sudo mv harvest-*/harvest /usr/local/bin/
+tar -xzf workflow-*.tar.gz
+sudo mv workflow-*/workflow /usr/local/bin/
 ```
 
 ### **Verificar Instalación**
 ```bash
-harvest version
-harvest --help
+workflow version
+workflow --help
 ```
 
 ## 🏢 **Características Enterprise**
@@ -55,14 +55,14 @@ harvest --help
 
 ## 🔄 **Auto-Update**
 
-Harvest CLI se actualiza automáticamente:
+workflow CLI se actualiza automáticamente:
 
 ```bash
 # Verificar actualizaciones
-harvest check-update
+workflow check-update
 
 # Actualizar a la última versión
-harvest upgrade
+workflow upgrade
 ```
 
 ## 🚀 Instalación desde Código Fuente
@@ -73,8 +73,8 @@ harvest upgrade
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker
+git clone https://github.com/lucasvidela94/workflow-cli.git
+cd workflow-cli
 
 # Instalar usando binario pre-compilado
 ./install-binary.sh
@@ -86,8 +86,8 @@ cd harvest-tracker
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker
+git clone https://github.com/lucasvidela94/workflow-cli.git
+cd workflow-cli
 
 # Instalar usando el script automático
 ./install.sh
@@ -106,38 +106,38 @@ make install
 
 ## 📋 Uso
 
-Una vez instalado, puedes usar `harvest` desde cualquier lugar:
+Una vez instalado, puedes usar `workflow` desde cualquier lugar:
 
 ```bash
 # Ver ayuda completa
-harvest --help
+workflow --help
 
 # Agregar tareas
-harvest add "Desarrollar nueva funcionalidad" 4.0
-harvest tech "API development" 3.5
-harvest meeting "Sprint planning" 1.5
-harvest qa "Testing new features" 2.0
-harvest daily
+workflow add "Desarrollar nueva funcionalidad" 4.0
+workflow tech "API development" 3.5
+workflow meeting "Sprint planning" 1.5
+workflow qa "Testing new features" 2.0
+workflow daily
 
 # Ver estado y progreso
-harvest status
+workflow status
 
 # Gestionar tareas
-harvest list                    # Listar todas las tareas
-harvest list --date 2025-07-21  # Tareas de fecha específica
-harvest search "bug"            # Buscar tareas
-harvest edit 1 --hours 3.0      # Editar tarea por ID
-harvest delete 2                # Eliminar tarea
-harvest complete 3              # Marcar como completada
+workflow list                    # Listar todas las tareas
+workflow list --date 2025-07-21  # Tareas de fecha específica
+workflow search "bug"            # Buscar tareas
+workflow edit 1 --hours 3.0      # Editar tarea por ID
+workflow delete 2                # Eliminar tarea
+workflow complete 3              # Marcar como completada
 
 # Reportes y exportación
-harvest report                  # Reporte para Harvest
-harvest export --format csv     # Exportar a CSV
-harvest export --format json    # Exportar a JSON
+workflow report                  # Reporte de productividad
+workflow export --format csv     # Exportar a CSV
+workflow export --format json    # Exportar a JSON
 
 # Actualización
-harvest check-update            # Verificar actualizaciones
-harvest upgrade                 # Actualizar automáticamente
+workflow check-update            # Verificar actualizaciones
+workflow upgrade                 # Actualizar automáticamente
 ```
 
 ## 🚀 Flujo de Trabajo Diario - Un Día en la Vida de un Dev
@@ -146,18 +146,18 @@ harvest upgrade                 # Actualizar automáticamente
 
 ```bash
 # Ver qué tareas quedaron pendientes de ayer
-harvest list --date 2025-07-20
+workflow list --date 2025-07-20
 
 # Agregar el daily standup
-harvest daily
+workflow daily
 
 # Agregar tareas planificadas para hoy
-harvest add "Revisar PRs pendientes" 1.0
-harvest add "Desarrollar feature de login" 4.0
-harvest add "Reunión de planning semanal" 1.5
+workflow add "Revisar PRs pendientes" 1.0
+workflow add "Desarrollar feature de login" 4.0
+workflow add "Reunión de planning semanal" 1.5
 
 # Ver el estado inicial del día
-harvest status
+workflow status
 ```
 
 **Output:**
@@ -174,13 +174,13 @@ harvest status
 
 ```bash
 # Completar la revisión de PRs
-harvest complete 1
+workflow complete 1
 
 # Agregar una tarea que surgió (bug fix urgente)
-harvest add "Fix bug crítico en producción" 2.0
+workflow add "Fix bug crítico en producción" 2.0
 
 # Ver estado actualizado
-harvest status
+workflow status
 ```
 
 **Output:**
@@ -198,43 +198,43 @@ harvest status
 
 ```bash
 # Ver qué tareas tenemos y reorganizar
-harvest list
+workflow list
 
 # Editar la tarea del bug para ser más específica
-harvest edit 4 --description "Fix bug crítico en API de usuarios" --hours 1.5
+workflow edit 4 --description "Fix bug crítico en API de usuarios" --hours 1.5
 
 # Buscar tareas similares para referencia
-harvest search "bug"
+workflow search "bug"
 ```
 
 ### 🌆 **Tarde (3:00 PM) - Progreso y Nuevas Tareas**
 
 ```bash
 # Completar el bug fix
-harvest complete 4
+workflow complete 4
 
 # Agregar tarea que surgió durante el desarrollo
-harvest add "Documentar nueva API" 1.0
+workflow add "Documentar nueva API" 1.0
 
 # Duplicar tarea de mañana para mañana (recurrente)
-harvest duplicate 1 --tomorrow
+workflow duplicate 1 --tomorrow
 
 # Ver progreso del día
-harvest status
+workflow status
 ```
 
 ### 🌙 **Fin de Día (5:30 PM) - Cierre y Reporte**
 
 ```bash
 # Completar tareas pendientes
-harvest complete 2
-harvest complete 3
+workflow complete 2
+workflow complete 3
 
 # Ver reporte final del día
-harvest report
+workflow report
 
-# Generar reporte para Harvest (formato legacy)
-harvest report --harvest
+# Generar reporte para workflow (formato legacy)
+workflow report --workflow
 ```
 
 **Output del reporte final:**
@@ -263,17 +263,17 @@ Pending: 1.0h
 
 ```bash
 # Ver reporte de toda la semana
-harvest report --week
+workflow report --week
 
 # Exportar datos de la semana para análisis
-harvest export --format csv --week --output semana-actual.csv
+workflow export --format csv --week --output semana-actual.csv
 
 # Buscar tareas técnicas de la semana
-harvest search --category tech --week
+workflow search --category tech --week
 
 # Ver tareas completadas vs pendientes
-harvest report --status completed --week
-harvest report --status pending --week
+workflow report --status completed --week
+workflow report --status pending --week
 ```
 
 **Output del reporte semanal:**
@@ -303,7 +303,7 @@ Completion rate: 90.9%
 ## 🎯 **Beneficios del Flujo Optimizado**
 
 ### ✅ **Sin Interrupciones**
-- No necesitas abrir Harvest durante el día
+- No necesitas abrir workflow durante el día
 - Registro de tareas en tiempo real desde la terminal
 - Flujo natural que se integra con tu trabajo
 
@@ -316,7 +316,7 @@ Completion rate: 90.9%
 ### ✅ **Reportes Automáticos**
 - Reportes detallados por día, semana y mes
 - Exportación a CSV/JSON para análisis
-- Formato legacy para copiar a Harvest
+- Formato legacy para copiar a workflow
 - Estadísticas y métricas automáticas
 
 ### ✅ **Flexibilidad Total**
@@ -328,58 +328,58 @@ Completion rate: 90.9%
 ## 🛠️ Comandos Disponibles
 
 ### 📝 Gestión de Tareas
-- `harvest add <descripción> <horas>` - Agregar nueva tarea
-- `harvest add --date 2025-07-20 <descripción> <horas>` - Agregar tarea para fecha específica
-- `harvest add --yesterday <descripción> <horas>` - Agregar tarea para ayer
-- `harvest add --tomorrow <descripción> <horas>` - Agregar tarea para mañana
-- `harvest tech <descripción> <horas>` - Agregar tarea técnica
-- `harvest meeting <descripción> <horas>` - Agregar reunión
-- `harvest qa <descripción> <horas>` - Agregar tarea de QA
-- `harvest daily` - Agregar daily standup (automático)
+- `workflow add <descripción> <horas>` - Agregar nueva tarea
+- `workflow add --date 2025-07-20 <descripción> <horas>` - Agregar tarea para fecha específica
+- `workflow add --yesterday <descripción> <horas>` - Agregar tarea para ayer
+- `workflow add --tomorrow <descripción> <horas>` - Agregar tarea para mañana
+- `workflow tech <descripción> <horas>` - Agregar tarea técnica
+- `workflow meeting <descripción> <horas>` - Agregar reunión
+- `workflow qa <descripción> <horas>` - Agregar tarea de QA
+- `workflow daily` - Agregar daily standup (automático)
 
 ### ✏️ Edición y Gestión
-- `harvest edit <id> --description "nueva descripción"` - Editar tarea existente
-- `harvest edit <id> --hours 2.5` - Cambiar horas de tarea
-- `harvest edit <id> --category tech` - Cambiar categoría
-- `harvest delete <id>` - Eliminar tarea
-- `harvest duplicate <id>` - Duplicar tarea
-- `harvest duplicate <id> --tomorrow` - Duplicar tarea para mañana
-- `harvest complete <id>` - Marcar tarea como completada
+- `workflow edit <id> --description "nueva descripción"` - Editar tarea existente
+- `workflow edit <id> --hours 2.5` - Cambiar horas de tarea
+- `workflow edit <id> --category tech` - Cambiar categoría
+- `workflow delete <id>` - Eliminar tarea
+- `workflow duplicate <id>` - Duplicar tarea
+- `workflow duplicate <id> --tomorrow` - Duplicar tarea para mañana
+- `workflow complete <id>` - Marcar tarea como completada
 
 ### 📊 Información y Reportes
-- `harvest status` - Ver estado actual de tareas
-- `harvest list` - Listar tareas con IDs visibles
-- `harvest list --date 2025-07-20` - Listar tareas de fecha específica
-- `harvest report` - Reporte detallado de hoy
-- `harvest report --week` - Reporte semanal
-- `harvest report --month` - Reporte mensual
-- `harvest report --date 2025-07-20` - Reporte de fecha específica
-- `harvest report --category tech` - Reporte filtrado por categoría
-- `harvest report --status completed` - Reporte de tareas completadas
-- `harvest report --harvest` - Formato legacy para Harvest app
+- `workflow status` - Ver estado actual de tareas
+- `workflow list` - Listar tareas con IDs visibles
+- `workflow list --date 2025-07-20` - Listar tareas de fecha específica
+- `workflow report` - Reporte detallado de hoy
+- `workflow report --week` - Reporte semanal
+- `workflow report --month` - Reporte mensual
+- `workflow report --date 2025-07-20` - Reporte de fecha específica
+- `workflow report --category tech` - Reporte filtrado por categoría
+- `workflow report --status completed` - Reporte de tareas completadas
+- `workflow report --workflow` - Formato legacy para workflow app
 
 ### 🔍 Búsqueda y Filtros
-- `harvest search "texto"` - Buscar tareas por texto
-- `harvest search --category tech` - Buscar por categoría
-- `harvest search --status pending` - Buscar por estado
-- `harvest search --date 2025-07-20` - Buscar por fecha
+- `workflow search "texto"` - Buscar tareas por texto
+- `workflow search --category tech` - Buscar por categoría
+- `workflow search --status pending` - Buscar por estado
+- `workflow search --date 2025-07-20` - Buscar por fecha
 
 ### 📤 Exportación
-- `harvest export --format csv` - Exportar a CSV
-- `harvest export --format json` - Exportar a JSON
-- `harvest export --week --format csv` - Exportar semana a CSV
-- `harvest export --category tech --format csv` - Exportar tareas técnicas
+- `workflow export --format csv` - Exportar a CSV
+- `workflow export --format json` - Exportar a JSON
+- `workflow export --week --format csv` - Exportar semana a CSV
+- `workflow export --category tech --format csv` - Exportar tareas técnicas
 
 ### 🔄 Migración y Sistema
-- `harvest migrate` - Migrar datos de JSON a SQLite
-- `harvest migrate --dry-run` - Simular migración
-- `harvest migrate --backup-only` - Solo crear backup
-- `harvest upgrade` - Actualizar a la última versión
-- `harvest rollback` - Gestionar rollbacks
+- `workflow migrate` - Migrar datos de JSON a SQLite
+- `workflow migrate --dry-run` - Simular migración
+- `workflow migrate --backup-only` - Solo crear backup
+- `workflow upgrade` - Actualizar a la última versión
+- `workflow rollback` - Gestionar rollbacks
 
 ## ⚙️ Configuración
 
-El CLI se configura automáticamente en `~/.harvest/`:
+El CLI se configura automáticamente en `~/.workflow/`:
 
 - `config.json` - Configuración general
 - `tasks.db` - Base de datos SQLite con todas las tareas
@@ -391,13 +391,13 @@ Si tienes datos en el formato JSON anterior, la migración es automática:
 
 ```bash
 # Migrar datos existentes a SQLite
-harvest migrate
+workflow migrate
 
 # Simular migración sin cambios
-harvest migrate --dry-run
+workflow migrate --dry-run
 
 # Solo crear backup
-harvest migrate --backup-only
+workflow migrate --backup-only
 ```
 
 ## 🔄 Actualizaciones
@@ -406,7 +406,7 @@ El sistema incluye un sistema de upgrade automático:
 
 ```bash
 # Verificar actualizaciones
-harvest upgrade
+workflow upgrade
 ```
 
 ## 🛡️ Seguridad
@@ -434,7 +434,7 @@ make uninstall-script
 
 ## 🐛 Solución de Problemas
 
-### El comando `harvest` no funciona
+### El comando `workflow` no funciona
 
 ```bash
 # Verificar instalación
@@ -452,8 +452,8 @@ source ~/.bashrc
 
 ```bash
 # Verificar que funciona
-harvest --version
-harvest --help
+workflow --version
+workflow --help
 ```
 
 ## 🔧 Desarrollo
@@ -462,17 +462,17 @@ harvest --help
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/lucasvidela94/harvest-tracker.git
-cd harvest-tracker
+git clone https://github.com/lucasvidela94/workflow-cli.git
+cd workflow-cli
 
 # Instalar dependencias
 go mod tidy
 
 # Compilar
-go build -o harvest ./cmd/harvest
+go build -o workflow ./cmd/workflow
 
 # Ejecutar
-./harvest --help
+./workflow --help
 ```
 
 ### Comandos de desarrollo
@@ -497,13 +497,13 @@ make dev
 ## 📁 Estructura del Proyecto
 
 ```
-harvest/
-├── cmd/harvest/          # Punto de entrada principal
+workflow/
+├── cmd/workflow/          # Punto de entrada principal
 ├── internal/             # Lógica interna del proyecto
 │   ├── cli/             # Comandos CLI
 │   ├── core/            # Lógica principal
 │   └── upgrade/         # Sistema de upgrade
-├── pkg/harvest/         # Tipos y utilidades
+├── pkg/workflow/         # Tipos y utilidades
 ├── build/               # Archivos de build para múltiples plataformas
 ├── releases/            # Releases compilados
 ├── install.sh           # Script de instalación
@@ -516,7 +516,7 @@ harvest/
 ├── CHANGELOG.md         # Historial de cambios
 ├── LICENSE              # Licencia del proyecto
 ├── VERSION              # Versión actual
-└── harvest              # Ejecutable compilado
+└── workflow              # Ejecutable compilado
 ```
 
 ## 🎯 Características Principales
@@ -567,7 +567,7 @@ Si tienes problemas o preguntas:
 - [x] Migración automática de datos
 
 ### 🚀 Próximas Funcionalidades
-- [ ] Integración directa con API de Harvest
+- [ ] Integración directa con API de workflow
 - [ ] Interfaz web para gestión de tareas
 - [ ] Sincronización en tiempo real
 - [ ] Analytics avanzados y métricas
@@ -578,4 +578,4 @@ Si tienes problemas o preguntas:
 
 ---
 
-**¡Disfruta usando Harvest CLI! 🌾** 
+**¡Disfruta usando workflow CLI! 🌾** 

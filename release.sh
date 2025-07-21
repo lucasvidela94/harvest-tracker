@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para crear releases distribuibles de Harvest CLI
+# Script para crear releases distribuibles de workflow CLI
 
 set -e
 
@@ -31,7 +31,7 @@ print_error() {
 # Variables
 VERSION=${1:-$(git describe --tags --always --dirty 2>/dev/null || echo "dev")}
 RELEASE_DIR="releases"
-DIST_DIR="$RELEASE_DIR/harvest-$VERSION"
+DIST_DIR="$RELEASE_DIR/workflow-$VERSION"
 
 # Plataformas soportadas
 PLATFORMS=(
@@ -60,15 +60,15 @@ create_release() {
     
     for platform in "${PLATFORMS[@]}"; do
         IFS='/' read -r GOOS GOARCH <<< "$platform"
-        BINARY_NAME="harvest"
+        BINARY_NAME="workflow"
         
         if [[ "$GOOS" == "windows" ]]; then
-            BINARY_NAME="harvest.exe"
+            BINARY_NAME="workflow.exe"
         fi
         
-        OUTPUT="$DIST_DIR/harvest-$GOOS-$GOARCH"
+        OUTPUT="$DIST_DIR/workflow-$GOOS-$GOARCH"
         if [[ "$GOOS" == "windows" ]]; then
-            OUTPUT="$DIST_DIR/harvest-$GOOS-$GOARCH.exe"
+            OUTPUT="$DIST_DIR/workflow-$GOOS-$GOARCH.exe"
         fi
         
         print_info "Compilando para $GOOS/$GOARCH..."
@@ -76,7 +76,7 @@ create_release() {
         GOOS=$GOOS GOARCH=$GOARCH go build \
             -ldflags "-X main.Version=$VERSION" \
             -o "$OUTPUT" \
-            ./cmd/harvest
+            ./cmd/workflow
         
         # Hacer ejecutable (excepto Windows)
         if [[ "$GOOS" != "windows" ]]; then
@@ -115,24 +115,24 @@ create_release() {
     
     for platform in "${PLATFORMS[@]}"; do
         IFS='/' read -r GOOS GOARCH <<< "$platform"
-        PLATFORM_DIR="harvest-$VERSION-$GOOS-$GOARCH"
+        PLATFORM_DIR="workflow-$VERSION-$GOOS-$GOARCH"
         
         # Crear directorio específico para la plataforma
         mkdir -p "$PLATFORM_DIR"
         
         # Copiar binario específico
         if [[ "$GOOS" == "windows" ]]; then
-            cp "harvest-$VERSION/harvest-$GOOS-$GOARCH.exe" "$PLATFORM_DIR/harvest.exe"
+            cp "workflow-$VERSION/workflow-$GOOS-$GOARCH.exe" "$PLATFORM_DIR/workflow.exe"
         else
-            cp "harvest-$VERSION/harvest-$GOOS-$GOARCH" "$PLATFORM_DIR/harvest"
-            chmod +x "$PLATFORM_DIR/harvest"
+            cp "workflow-$VERSION/workflow-$GOOS-$GOARCH" "$PLATFORM_DIR/workflow"
+            chmod +x "$PLATFORM_DIR/workflow"
         fi
         
         # Copiar archivos adicionales
-        cp harvest-$VERSION/install.sh "$PLATFORM_DIR/" 2>/dev/null || true
-        cp harvest-$VERSION/uninstall.sh "$PLATFORM_DIR/" 2>/dev/null || true
-        cp harvest-$VERSION/README.md "$PLATFORM_DIR/" 2>/dev/null || true
-        cp harvest-$VERSION/LICENSE "$PLATFORM_DIR/" 2>/dev/null || true
+        cp workflow-$VERSION/install.sh "$PLATFORM_DIR/" 2>/dev/null || true
+        cp workflow-$VERSION/uninstall.sh "$PLATFORM_DIR/" 2>/dev/null || true
+        cp workflow-$VERSION/README.md "$PLATFORM_DIR/" 2>/dev/null || true
+        cp workflow-$VERSION/LICENSE "$PLATFORM_DIR/" 2>/dev/null || true
         
         # Crear archivo tar.gz
         tar -czf "$PLATFORM_DIR.tar.gz" "$PLATFORM_DIR"
@@ -149,19 +149,19 @@ create_release() {
             IFS='/' read -r GOOS GOARCH <<< "$platform"
             
             if [[ "$GOOS" == "windows" ]]; then
-                PLATFORM_DIR="harvest-$VERSION-$GOOS-$GOARCH"
+                PLATFORM_DIR="workflow-$VERSION-$GOOS-$GOARCH"
                 
                 # Crear directorio específico para la plataforma
                 mkdir -p "$PLATFORM_DIR"
                 
                 # Copiar binario específico
-                cp "harvest-$VERSION/harvest-$GOOS-$GOARCH.exe" "$PLATFORM_DIR/harvest.exe"
+                cp "workflow-$VERSION/workflow-$GOOS-$GOARCH.exe" "$PLATFORM_DIR/workflow.exe"
                 
                 # Copiar archivos adicionales
-                cp harvest-$VERSION/install.sh "$PLATFORM_DIR/" 2>/dev/null || true
-                cp harvest-$VERSION/uninstall.sh "$PLATFORM_DIR/" 2>/dev/null || true
-                cp harvest-$VERSION/README.md "$PLATFORM_DIR/" 2>/dev/null || true
-                cp harvest-$VERSION/LICENSE "$PLATFORM_DIR/" 2>/dev/null || true
+                cp workflow-$VERSION/install.sh "$PLATFORM_DIR/" 2>/dev/null || true
+                cp workflow-$VERSION/uninstall.sh "$PLATFORM_DIR/" 2>/dev/null || true
+                cp workflow-$VERSION/README.md "$PLATFORM_DIR/" 2>/dev/null || true
+                cp workflow-$VERSION/LICENSE "$PLATFORM_DIR/" 2>/dev/null || true
                 
                 # Crear archivo ZIP
                 zip -r "$PLATFORM_DIR.zip" "$PLATFORM_DIR"
@@ -184,7 +184,7 @@ create_release() {
     # SHA256 checksums
     for file in *.tar.gz *.zip; do
         if [[ -f "$file" ]]; then
-            sha256sum "$file" >> "harvest-$VERSION-checksums.txt"
+            sha256sum "$file" >> "workflow-$VERSION-checksums.txt"
         fi
     done
     
@@ -195,7 +195,7 @@ create_release() {
 
 # Función para mostrar ayuda
 show_help() {
-    echo "🌾 Harvest CLI - Release Script"
+    echo "🌾 workflow CLI - Release Script"
     echo ""
     echo "Uso: $0 [VERSION]"
     echo ""

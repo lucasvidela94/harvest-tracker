@@ -43,4 +43,4 @@ Thumbs.db
 *.temp
 
 # User data (no incluir datos de usuario)
-# ~/.harvest/ se maneja por separado 
+# ~/.workflow/ se maneja por separado 
