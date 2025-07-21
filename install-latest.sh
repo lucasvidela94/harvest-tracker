@@ -48,8 +48,8 @@ else
     exit 1
 fi
 
-# URL del release (binario individual)
-RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$OS-$ARCH$EXT"
+# URL del release (tarball)
+RELEASE_URL="https://github.com/$REPO/releases/download/$LATEST_VERSION/workflow-$LATEST_VERSION-$OS-$ARCH.tar.gz"
 
 echo -e "${BLUE}📦 Descargando desde: $RELEASE_URL${NC}"
 
@@ -59,20 +59,30 @@ cd "$TEMP_DIR"
 
 # Descargar release
 echo -e "${YELLOW}⬇️  Descargando...${NC}"
-curl -L -o "workflow" "$RELEASE_URL"
+curl -L -o "workflow.tar.gz" "$RELEASE_URL"
 
 # Verificar que el archivo se descargó correctamente
-if [ ! -f "workflow" ] || [ ! -s "workflow" ]; then
+if [ ! -f "workflow.tar.gz" ] || [ ! -s "workflow.tar.gz" ]; then
     echo -e "${RED}❌ Error: No se pudo descargar el archivo${NC}"
     exit 1
 fi
 
+# Extraer tarball
+echo -e "${YELLOW}📦 Extrayendo...${NC}"
+tar -xzf workflow.tar.gz
+
+# Verificar que el binario existe
+if [ ! -f "workflow-$LATEST_VERSION-$OS-$ARCH/workflow" ]; then
+    echo -e "${RED}❌ Error: No se encontró el binario en el tarball${NC}"
+    exit 1
+fi
+
 # Hacer ejecutable
-chmod +x workflow
+chmod +x "workflow-$LATEST_VERSION-$OS-$ARCH/workflow"
 
 # Instalar
 echo -e "${YELLOW}🔧 Instalando...${NC}"
-sudo mv "workflow" /usr/local/bin/workflow
+sudo mv "workflow-$LATEST_VERSION-$OS-$ARCH/workflow" /usr/local/bin/workflow
 
 # Limpiar
 cd /
