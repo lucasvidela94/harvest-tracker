@@ -8,7 +8,7 @@ SCOPE.md
 
 # Archivos de build
 build/
-releases/
+# releases/ - INCLUIR para tests
 *.tar.gz
 *.zip
 *.exe

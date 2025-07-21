@@ -41,6 +41,13 @@ test-migration: test-build
 	docker run --rm --name $(CONTAINER_NAME) $(IMAGE_NAME) bash -c "echo 'Creando datos JSON viejos...' && mkdir -p ~/.harvest && echo '[{\"id\":1,\"description\":\"Old task\",\"hours\":2.0,\"category\":\"general\",\"date\":\"2025-07-21\",\"created_at\":\"2025-07-21T10:00:00Z\"}]' > ~/.harvest/tasks.json && echo 'Ejecutando migración...' && harvest migrate --dry-run && echo 'Migración exitosa!'"
 	@echo "✅ Test de migración completado"
 
+# Test de instalación sin Go
+test-no-go:
+	@echo "🚫 Ejecutando test de instalación sin Go..."
+	docker build -f Dockerfile.test-no-go -t harvest-test-no-go .
+	docker run --rm --name harvest-test-no-go-container harvest-test-no-go /test/test-no-go.sh
+	@echo "✅ Test de instalación sin Go completado"
+
 # Ayuda
 test-help:
 	@echo "📋 Comandos disponibles para testing:"
@@ -49,5 +56,6 @@ test-help:
 	@echo "  make test-shell     - Shell interactivo para testing"
 	@echo "  make test-quick     - Test rápido (solo básicos)"
 	@echo "  make test-migration - Test específico de migración"
+	@echo "  make test-no-go     - Test de instalación sin Go"
 	@echo "  make test-clean     - Limpiar recursos de test"
 	@echo "  make test-help      - Mostrar esta ayuda" 

@@ -6,7 +6,22 @@ Una herramienta de línea de comandos moderna y eficiente para gestionar tareas 
 
 ## 🚀 Instalación Rápida
 
-### Instalación Automática (Recomendada)
+### Opción 1: Instalación con Binario Pre-compilado (Recomendada)
+
+**No requiere Go instalado - ¡Más fácil!**
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/lucasvidela94/harvest-tracker.git
+cd harvest-tracker
+
+# Instalar usando binario pre-compilado
+./install-binary.sh
+```
+
+### Opción 2: Instalación desde Código Fuente
+
+**Requiere Go 1.24.5+ instalado**
 
 ```bash
 # Clonar el repositorio
@@ -17,7 +32,7 @@ cd harvest-tracker
 ./install.sh
 ```
 
-### Instalación Manual
+### Opción 3: Instalación Manual
 
 ```bash
 # Compilar e instalar
