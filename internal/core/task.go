@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/lucasvidela94/harvest-cli/pkg/harvest"
@@ -93,6 +95,13 @@ func (tm *TaskManager) LoadTasks() ([]harvest.Task, error) {
 			task.Date = date
 		}
 
+		// Status (con valor por defecto para tareas existentes)
+		if status, ok := rawTask["status"].(string); ok {
+			task.Status = status
+		} else {
+			task.Status = harvest.StatusPending // Valor por defecto para tareas existentes
+		}
+
 		// CreatedAt - manejar diferentes formatos
 		if createdAt, ok := rawTask["created_at"].(string); ok {
 			// Intentar diferentes formatos de fecha
@@ -152,7 +161,7 @@ func (tm *TaskManager) SaveTasks(tasks []harvest.Task) error {
 }
 
 // AddTask agrega una nueva tarea
-func (tm *TaskManager) AddTask(description string, hours float64, category string) error {
+func (tm *TaskManager) AddTask(description string, hours float64, category string, date string) error {
 	tasks, err := tm.LoadTasks()
 	if err != nil {
 		return fmt.Errorf("could not load tasks: %v", err)
@@ -170,13 +179,20 @@ func (tm *TaskManager) AddTask(description string, hours float64, category strin
 		newID = maxID + 1
 	}
 
+	// Usar fecha proporcionada o fecha actual
+	taskDate := date
+	if taskDate == "" {
+		taskDate = time.Now().Format("2006-01-02")
+	}
+
 	// Crear nueva tarea
 	newTask := harvest.Task{
 		ID:          newID,
 		Description: description,
 		Hours:       hours,
 		Category:    category,
-		Date:        time.Now().Format("2006-01-02"),
+		Date:        taskDate,
+		Status:      harvest.StatusPending,
 		CreatedAt:   time.Now(),
 	}
 
@@ -189,6 +205,92 @@ func (tm *TaskManager) AddTask(description string, hours float64, category strin
 	}
 
 	return nil
+}
+
+// UpdateTask actualiza una tarea existente por ID
+func (tm *TaskManager) UpdateTask(id int, description string, hours float64, category string) error {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return fmt.Errorf("could not load tasks: %v", err)
+	}
+
+	// Buscar la tarea por ID
+	taskIndex := -1
+	for i, task := range tasks {
+		if task.ID == id {
+			taskIndex = i
+			break
+		}
+	}
+
+	if taskIndex == -1 {
+		return fmt.Errorf("task with ID %d not found", id)
+	}
+
+	// Actualizar la tarea
+	if description != "" {
+		tasks[taskIndex].Description = description
+	}
+	if hours > 0 {
+		tasks[taskIndex].Hours = hours
+	}
+	if category != "" {
+		tasks[taskIndex].Category = category
+	}
+
+	// Guardar cambios
+	if err := tm.SaveTasks(tasks); err != nil {
+		return fmt.Errorf("could not save tasks: %v", err)
+	}
+
+	return nil
+}
+
+// DeleteTask elimina una tarea por ID
+func (tm *TaskManager) DeleteTask(id int) error {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return fmt.Errorf("could not load tasks: %v", err)
+	}
+
+	// Buscar y eliminar la tarea por ID
+	taskIndex := -1
+	for i, task := range tasks {
+		if task.ID == id {
+			taskIndex = i
+			break
+		}
+	}
+
+	if taskIndex == -1 {
+		return fmt.Errorf("task with ID %d not found", id)
+	}
+
+	// Eliminar la tarea
+	tasks = append(tasks[:taskIndex], tasks[taskIndex+1:]...)
+
+	// Guardar cambios
+	if err := tm.SaveTasks(tasks); err != nil {
+		return fmt.Errorf("could not save tasks: %v", err)
+	}
+
+	return nil
+}
+
+// GetTaskByID obtiene una tarea específica por ID
+func (tm *TaskManager) GetTaskByID(id int) (*harvest.Task, error) {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return nil, fmt.Errorf("could not load tasks: %v", err)
+	}
+
+	for _, task := range tasks {
+		if task.ID == id {
+			return &task, nil
+		}
+	}
+
+	return nil, fmt.Errorf("task with ID %d not found", id)
 }
 
 // GetTodayTasks obtiene las tareas del día actual
@@ -227,4 +329,148 @@ func (tm *TaskManager) GetDailyHoursTarget() float64 {
 // GetDailyStandupHours obtiene las horas del daily standup
 func (tm *TaskManager) GetDailyStandupHours() float64 {
 	return tm.configManager.GetDailyStandupHours()
+}
+
+// GetTasksByDate obtiene las tareas de una fecha específica
+func (tm *TaskManager) GetTasksByDate(date string) ([]harvest.Task, error) {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredTasks []harvest.Task
+	for _, task := range tasks {
+		if task.Date == date {
+			filteredTasks = append(filteredTasks, task)
+		}
+	}
+	return filteredTasks, nil
+}
+
+// CompleteTask marca una tarea como completada
+func (tm *TaskManager) CompleteTask(id int) error {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return fmt.Errorf("could not load tasks: %v", err)
+	}
+
+	// Buscar la tarea por ID
+	taskIndex := -1
+	for i, task := range tasks {
+		if task.ID == id {
+			taskIndex = i
+			break
+		}
+	}
+
+	if taskIndex == -1 {
+		return fmt.Errorf("task with ID %d not found", id)
+	}
+
+	// Marcar como completada
+	tasks[taskIndex].Status = harvest.StatusCompleted
+
+	// Guardar cambios
+	if err := tm.SaveTasks(tasks); err != nil {
+		return fmt.Errorf("could not save tasks: %v", err)
+	}
+
+	return nil
+}
+
+// UpdateTaskStatus actualiza el estado de una tarea
+func (tm *TaskManager) UpdateTaskStatus(id int, status string) error {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return fmt.Errorf("could not load tasks: %v", err)
+	}
+
+	// Buscar la tarea por ID
+	taskIndex := -1
+	for i, task := range tasks {
+		if task.ID == id {
+			taskIndex = i
+			break
+		}
+	}
+
+	if taskIndex == -1 {
+		return fmt.Errorf("task with ID %d not found", id)
+	}
+
+	// Validar estado
+	validStatuses := []string{harvest.StatusPending, harvest.StatusInProgress, harvest.StatusCompleted, harvest.StatusPaused}
+	isValid := false
+	for _, validStatus := range validStatuses {
+		if status == validStatus {
+			isValid = true
+			break
+		}
+	}
+
+	if !isValid {
+		return fmt.Errorf("invalid status: %s. Valid statuses are: %v", status, validStatuses)
+	}
+
+	// Actualizar estado
+	tasks[taskIndex].Status = status
+
+	// Guardar cambios
+	if err := tm.SaveTasks(tasks); err != nil {
+		return fmt.Errorf("could not save tasks: %v", err)
+	}
+
+	return nil
+}
+
+// SearchTasks busca tareas según criterios específicos
+func (tm *TaskManager) SearchTasks(query string, category string, status string, date string) ([]harvest.Task, error) {
+	tasks, err := tm.LoadTasks()
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredTasks []harvest.Task
+
+	for _, task := range tasks {
+		// Filtro por texto (descripción)
+		if query != "" {
+			if !strings.Contains(strings.ToLower(task.Description), strings.ToLower(query)) {
+				continue
+			}
+		}
+
+		// Filtro por categoría
+		if category != "" {
+			if task.Category != category {
+				continue
+			}
+		}
+
+		// Filtro por estado
+		if status != "" {
+			if task.Status != status {
+				continue
+			}
+		}
+
+		// Filtro por fecha
+		if date != "" {
+			if task.Date != date {
+				continue
+			}
+		}
+
+		filteredTasks = append(filteredTasks, task)
+	}
+
+	// Ordenar por fecha (más reciente primero) y luego por ID
+	sort.Slice(filteredTasks, func(i, j int) bool {
+		if filteredTasks[i].Date != filteredTasks[j].Date {
+			return filteredTasks[i].Date > filteredTasks[j].Date
+		}
+		return filteredTasks[i].ID > filteredTasks[j].ID
+	})
+
+	return filteredTasks, nil
 }

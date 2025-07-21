@@ -59,6 +59,9 @@ Use "harvest [command] --help" for more information about a command.
 	rootCmd.AddCommand(versionCmd)
 
 	// Comando add
+	addCmd.Flags().String("date", "", "Specific date for the task (format: YYYY-MM-DD)")
+	addCmd.Flags().Bool("yesterday", false, "Add task for yesterday")
+	addCmd.Flags().Bool("tomorrow", false, "Add task for tomorrow")
 	rootCmd.AddCommand(addCmd)
 
 	// Comando status
@@ -78,6 +81,47 @@ Use "harvest [command] --help" for more information about a command.
 
 	// Agregar comando rollback
 	rootCmd.AddCommand(rollbackCmd)
+
+	// Comando list
+	listCmd.Flags().String("date", "", "Date to list tasks for (format: YYYY-MM-DD)")
+	rootCmd.AddCommand(listCmd)
+
+	// Flags para edit
+	editCmd.Flags().String("description", "", "New description for the task")
+	editCmd.Flags().String("hours", "", "New hours for the task")
+	editCmd.Flags().String("category", "", "New category for the task")
+
+	// Flags para delete
+	deleteCmd.Flags().Bool("force", false, "Force deletion without confirmation")
+
+	// Agregar comandos
+	rootCmd.AddCommand(editCmd)
+	rootCmd.AddCommand(deleteCmd)
+
+	// Flags para complete
+	completeCmd.Flags().Bool("force", false, "Force completion without confirmation")
+
+	// Agregar comando
+	rootCmd.AddCommand(completeCmd)
+
+	// Flags para search
+	searchCmd.Flags().String("category", "", "Filter by category")
+	searchCmd.Flags().String("status", "", "Filter by status (pending, in_progress, completed, paused)")
+	searchCmd.Flags().String("date", "", "Filter by date (format: YYYY-MM-DD)")
+
+	// Flags para report
+	reportCmd.Flags().String("date", "", "Generate report for specific date (format: YYYY-MM-DD)")
+	reportCmd.Flags().Bool("week", false, "Generate weekly report")
+	reportCmd.Flags().Bool("month", false, "Generate monthly report")
+	reportCmd.Flags().String("category", "", "Filter by category")
+	reportCmd.Flags().String("status", "", "Filter by status (pending, in_progress, completed, paused)")
+	reportCmd.Flags().Bool("harvest", false, "Generate legacy Harvest format report")
+
+	// Agregar comando
+	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(migrateCmd)
+	rootCmd.AddCommand(duplicateCmd)
+	rootCmd.AddCommand(exportCmd)
 }
 
 // rollbackCmd es el comando para gestionar rollbacks
@@ -186,7 +230,10 @@ var addCmd = &cobra.Command{
 Examples:
   harvest add "Fix bug" 2.0
   harvest add "Development" 3.5 tech
-  harvest add "Meeting" 1.0 meeting`,
+  harvest add "Meeting" 1.0 meeting
+  harvest add --date 2025-07-20 "Tarea del lunes" 3.0
+  harvest add --yesterday "Tarea olvidada" 2.0
+  harvest add --tomorrow "Planificación" 1.5`,
 	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		description := args[0]
@@ -208,9 +255,41 @@ Examples:
 			category = args[2]
 		}
 
+		// Determinar fecha basada en flags
+		date := ""
+		dateFlag, _ := cmd.Flags().GetString("date")
+		yesterdayFlag, _ := cmd.Flags().GetBool("yesterday")
+		tomorrowFlag, _ := cmd.Flags().GetBool("tomorrow")
+
+		// Validar que solo se use un flag de fecha
+		dateFlagsCount := 0
+		if dateFlag != "" {
+			dateFlagsCount++
+		}
+		if yesterdayFlag {
+			dateFlagsCount++
+		}
+		if tomorrowFlag {
+			dateFlagsCount++
+		}
+
+		if dateFlagsCount > 1 {
+			printError(fmt.Errorf("only one date flag can be used at a time (--date, --yesterday, --tomorrow)"))
+			return
+		}
+
+		// Establecer fecha según flags
+		if dateFlag != "" {
+			date = dateFlag
+		} else if yesterdayFlag {
+			date = time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+		} else if tomorrowFlag {
+			date = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+		}
+
 		// Agregar tarea
 		taskManager := core.NewTaskManager()
-		if err := taskManager.AddTask(description, hours, category); err != nil {
+		if err := taskManager.AddTask(description, hours, category, date); err != nil {
 			printError(err)
 			return
 		}
@@ -260,7 +339,8 @@ func showStatus(taskManager *core.TaskManager) {
 		fmt.Println("\n📝 Today's tasks:")
 		for _, task := range todayTasks {
 			icon := harvest.GetIcon(task.Category)
-			fmt.Printf("  %s %s - %.1fh\n", icon, task.Description, task.Hours)
+			statusIcon := harvest.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s - %.1fh (%s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}
 	}
 }
@@ -311,7 +391,8 @@ func showDetailedStatus(taskManager *core.TaskManager) {
 	if len(todayTasks) > 0 {
 		for _, task := range todayTasks {
 			icon := harvest.GetIcon(task.Category)
-			fmt.Printf("  %s %s (%.1fh)\n", icon, task.Description, task.Hours)
+			statusIcon := harvest.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
 		}
 	} else {
 		fmt.Println("  No tasks for today")
@@ -360,7 +441,7 @@ Examples:
 
 		// Agregar tarea técnica
 		taskManager := core.NewTaskManager()
-		if err := taskManager.AddTask(description, hours, "tech"); err != nil {
+		if err := taskManager.AddTask(description, hours, "tech", ""); err != nil {
 			printError(err)
 			return
 		}
@@ -393,7 +474,7 @@ Examples:
 
 		// Agregar tarea de reunión
 		taskManager := core.NewTaskManager()
-		if err := taskManager.AddTask(description, hours, "meeting"); err != nil {
+		if err := taskManager.AddTask(description, hours, "meeting", ""); err != nil {
 			printError(err)
 			return
 		}
@@ -426,7 +507,7 @@ Examples:
 
 		// Agregar tarea de QA
 		taskManager := core.NewTaskManager()
-		if err := taskManager.AddTask(description, hours, "qa"); err != nil {
+		if err := taskManager.AddTask(description, hours, "qa", ""); err != nil {
 			printError(err)
 			return
 		}
@@ -451,7 +532,7 @@ duration configured in your settings.`,
 		dailyHours := taskManager.GetDailyStandupHours()
 
 		// Agregar tarea de daily
-		if err := taskManager.AddTask("Daily Standup", dailyHours, "daily"); err != nil {
+		if err := taskManager.AddTask("Daily Standup", dailyHours, "daily", ""); err != nil {
 			printError(err)
 			return
 		}
@@ -464,22 +545,58 @@ duration configured in your settings.`,
 // reportCmd es el comando para generar reportes
 var reportCmd = &cobra.Command{
 	Use:   "report",
-	Short: "Generate report for Harvest",
-	Long: `Generate a formatted report for Harvest.
+	Short: "Generate detailed reports",
+	Long: `Generate detailed reports of tasks and time tracking.
 
-The report shows all today's tasks in the format:
-"Description - X.Xh"
+You can specify date ranges and filters to customize the report.
 
-This format is ready to copy and paste into Harvest.`,
-	Args: cobra.NoArgs,
+Examples:
+  harvest report
+  harvest report --date 2025-07-21
+  harvest report --week
+  harvest report --month
+  harvest report --date 2025-07-21 --category tech
+  harvest report --status completed
+  harvest report --harvest (legacy format for Harvest app)`,
 	Run: func(cmd *cobra.Command, args []string) {
-		taskManager := core.NewTaskManager()
-		generateReport(taskManager)
+		dateFlag, _ := cmd.Flags().GetString("date")
+		weekFlag, _ := cmd.Flags().GetBool("week")
+		monthFlag, _ := cmd.Flags().GetBool("month")
+		categoryFlag, _ := cmd.Flags().GetString("category")
+		statusFlag, _ := cmd.Flags().GetString("status")
+		harvestFlag, _ := cmd.Flags().GetBool("harvest")
+
+		// Validar que solo se use un flag de período
+		periodFlagsCount := 0
+		if dateFlag != "" {
+			periodFlagsCount++
+		}
+		if weekFlag {
+			periodFlagsCount++
+		}
+		if monthFlag {
+			periodFlagsCount++
+		}
+
+		if periodFlagsCount > 1 {
+			printError(fmt.Errorf("only one period flag can be used at a time (--date, --week, --month)"))
+			return
+		}
+
+		if harvestFlag {
+			// Formato legacy para Harvest
+			taskManager := core.NewTaskManagerSQLite()
+			defer taskManager.Close()
+			generateHarvestReport(taskManager)
+		} else {
+			// Nuevo formato detallado
+			performDetailedReport(dateFlag, weekFlag, monthFlag, categoryFlag, statusFlag)
+		}
 	},
 }
 
-// generateReport genera el reporte para Harvest
-func generateReport(taskManager *core.TaskManager) {
+// generateHarvestReport genera el reporte legacy para Harvest
+func generateHarvestReport(taskManager *core.TaskManagerSQLite) {
 	todayTasks, err := taskManager.GetTodayTasks()
 	if err != nil {
 		printError(err)
@@ -511,6 +628,279 @@ func generateReport(taskManager *core.TaskManager) {
 	} else {
 		printSuccess("Report copied to clipboard!")
 	}
+}
+
+// performDetailedReport ejecuta la generación del reporte detallado
+func performDetailedReport(date string, week bool, month bool, category string, status string) {
+	taskManager := core.NewTaskManagerSQLite()
+	defer taskManager.Close()
+
+	var tasks []harvest.Task
+	var err error
+
+	// Determinar período del reporte
+	if date != "" {
+		// Reporte de fecha específica
+		tasks, err = taskManager.GetTasksByDate(date)
+		if err != nil {
+			printError(fmt.Errorf("could not load tasks for date %s: %v", date, err))
+			return
+		}
+		generateDateReport(date, tasks, category, status)
+	} else if week {
+		// Reporte semanal
+		startDate := getWeekStart()
+		endDate := getWeekEnd()
+		tasks, err = taskManager.SearchTasks("", category, status, "")
+		if err != nil {
+			printError(fmt.Errorf("could not load tasks: %v", err))
+			return
+		}
+		// Filtrar por semana
+		var weekTasks []harvest.Task
+		for _, task := range tasks {
+			if task.Date >= startDate && task.Date <= endDate {
+				weekTasks = append(weekTasks, task)
+			}
+		}
+		generateWeekReport(startDate, endDate, weekTasks, category, status)
+	} else if month {
+		// Reporte mensual
+		startDate := getMonthStart()
+		endDate := getMonthEnd()
+		tasks, err = taskManager.SearchTasks("", category, status, "")
+		if err != nil {
+			printError(fmt.Errorf("could not load tasks: %v", err))
+			return
+		}
+		// Filtrar por mes
+		var monthTasks []harvest.Task
+		for _, task := range tasks {
+			if task.Date >= startDate && task.Date <= endDate {
+				monthTasks = append(monthTasks, task)
+			}
+		}
+		generateMonthReport(startDate, endDate, monthTasks, category, status)
+	} else {
+		// Reporte de hoy por defecto
+		today := time.Now().Format("2006-01-02")
+		tasks, err = taskManager.GetTasksByDate(today)
+		if err != nil {
+			printError(fmt.Errorf("could not load today's tasks: %v", err))
+			return
+		}
+		generateDateReport(today, tasks, category, status)
+	}
+}
+
+// generateDateReport genera reporte para una fecha específica
+func generateDateReport(date string, tasks []harvest.Task, category string, status string) {
+	fmt.Printf("📊 Report for %s\n", date)
+	fmt.Printf("%s\n", strings.Repeat("=", 50))
+
+	if len(tasks) == 0 {
+		fmt.Println("📝 No tasks found for this date.")
+		return
+	}
+
+	// Aplicar filtros
+	var filteredTasks []harvest.Task
+	for _, task := range tasks {
+		if category != "" && task.Category != category {
+			continue
+		}
+		if status != "" && task.Status != status {
+			continue
+		}
+		filteredTasks = append(filteredTasks, task)
+	}
+
+	if len(filteredTasks) == 0 {
+		fmt.Println("📝 No tasks match the specified filters.")
+		return
+	}
+
+	// Mostrar tareas
+	fmt.Printf("📋 Tasks (%d):\n", len(filteredTasks))
+	for _, task := range filteredTasks {
+		fmt.Printf("[%d] %s %s (%.1fh, %s) %s\n",
+			task.ID,
+			harvest.GetIcon(task.Category),
+			task.Description,
+			task.Hours,
+			task.Category,
+			harvest.GetStatusIcon(task.Status))
+	}
+
+	// Estadísticas
+	totalHours := 0.0
+	completedHours := 0.0
+	pendingHours := 0.0
+	categoryStats := make(map[string]float64)
+
+	for _, task := range filteredTasks {
+		totalHours += task.Hours
+		categoryStats[task.Category] += task.Hours
+
+		if task.Status == harvest.StatusCompleted {
+			completedHours += task.Hours
+		} else {
+			pendingHours += task.Hours
+		}
+	}
+
+	fmt.Printf("\n📈 Statistics:\n")
+	fmt.Printf("Total hours: %.1fh\n", totalHours)
+	fmt.Printf("Completed: %.1fh\n", completedHours)
+	fmt.Printf("Pending: %.1fh\n", pendingHours)
+
+	if len(categoryStats) > 1 {
+		fmt.Printf("\n📊 By category:\n")
+		for category, hours := range categoryStats {
+			fmt.Printf("  %s: %.1fh\n", category, hours)
+		}
+	}
+}
+
+// generateWeekReport genera reporte semanal
+func generateWeekReport(startDate, endDate string, tasks []harvest.Task, category string, status string) {
+	fmt.Printf("📊 Weekly Report (%s to %s)\n", startDate, endDate)
+	fmt.Printf("%s\n", strings.Repeat("=", 50))
+
+	if len(tasks) == 0 {
+		fmt.Println("📝 No tasks found for this week.")
+		return
+	}
+
+	// Agrupar por fecha
+	dateGroups := make(map[string][]harvest.Task)
+	for _, task := range tasks {
+		dateGroups[task.Date] = append(dateGroups[task.Date], task)
+	}
+
+	// Mostrar por día
+	for date := startDate; date <= endDate; date = addDays(date, 1) {
+		if dayTasks, exists := dateGroups[date]; exists {
+			fmt.Printf("\n📅 %s:\n", date)
+			totalDayHours := 0.0
+			for _, task := range dayTasks {
+				fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n",
+					task.ID,
+					harvest.GetIcon(task.Category),
+					task.Description,
+					task.Hours,
+					task.Category,
+					harvest.GetStatusIcon(task.Status))
+				totalDayHours += task.Hours
+			}
+			fmt.Printf("  Total: %.1fh\n", totalDayHours)
+		}
+	}
+
+	// Estadísticas semanales
+	totalHours := 0.0
+	completedHours := 0.0
+	categoryStats := make(map[string]float64)
+
+	for _, task := range tasks {
+		totalHours += task.Hours
+		categoryStats[task.Category] += task.Hours
+		if task.Status == harvest.StatusCompleted {
+			completedHours += task.Hours
+		}
+	}
+
+	fmt.Printf("\n📈 Weekly Summary:\n")
+	fmt.Printf("Total hours: %.1fh\n", totalHours)
+	fmt.Printf("Completed: %.1fh\n", completedHours)
+	fmt.Printf("Completion rate: %.1f%%\n", (completedHours/totalHours)*100)
+
+	if len(categoryStats) > 1 {
+		fmt.Printf("\n📊 By category:\n")
+		for category, hours := range categoryStats {
+			fmt.Printf("  %s: %.1fh\n", category, hours)
+		}
+	}
+}
+
+// generateMonthReport genera reporte mensual
+func generateMonthReport(startDate, endDate string, tasks []harvest.Task, category string, status string) {
+	fmt.Printf("📊 Monthly Report (%s to %s)\n", startDate, endDate)
+	fmt.Printf("%s\n", strings.Repeat("=", 50))
+
+	if len(tasks) == 0 {
+		fmt.Println("📝 No tasks found for this month.")
+		return
+	}
+
+	// Estadísticas mensuales
+	totalHours := 0.0
+	completedHours := 0.0
+	categoryStats := make(map[string]float64)
+	statusStats := make(map[string]int)
+
+	for _, task := range tasks {
+		totalHours += task.Hours
+		categoryStats[task.Category] += task.Hours
+		statusStats[task.Status]++
+
+		if task.Status == harvest.StatusCompleted {
+			completedHours += task.Hours
+		}
+	}
+
+	fmt.Printf("📈 Monthly Summary:\n")
+	fmt.Printf("Total hours: %.1fh\n", totalHours)
+	fmt.Printf("Completed: %.1fh\n", completedHours)
+	fmt.Printf("Completion rate: %.1f%%\n", (completedHours/totalHours)*100)
+	fmt.Printf("Total tasks: %d\n", len(tasks))
+
+	fmt.Printf("\n📊 By category:\n")
+	for category, hours := range categoryStats {
+		fmt.Printf("  %s: %.1fh\n", category, hours)
+	}
+
+	fmt.Printf("\n📊 By status:\n")
+	for status, count := range statusStats {
+		fmt.Printf("  %s: %d tasks\n", status, count)
+	}
+}
+
+// Funciones auxiliares para fechas
+func getWeekStart() string {
+	now := time.Now()
+	weekday := now.Weekday()
+	if weekday == time.Sunday {
+		weekday = 7
+	} else {
+		weekday--
+	}
+	weekStart := now.AddDate(0, 0, -int(weekday))
+	return weekStart.Format("2006-01-02")
+}
+
+func getWeekEnd() string {
+	weekStart, _ := time.Parse("2006-01-02", getWeekStart())
+	weekEnd := weekStart.AddDate(0, 0, 6)
+	return weekEnd.Format("2006-01-02")
+}
+
+func getMonthStart() string {
+	now := time.Now()
+	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	return monthStart.Format("2006-01-02")
+}
+
+func getMonthEnd() string {
+	now := time.Now()
+	monthEnd := time.Date(now.Year(), now.Month()+1, 0, 0, 0, 0, 0, now.Location())
+	return monthEnd.Format("2006-01-02")
+}
+
+func addDays(date string, days int) string {
+	t, _ := time.Parse("2006-01-02", date)
+	newDate := t.AddDate(0, 0, days)
+	return newDate.Format("2006-01-02")
 }
 
 // copyToClipboard intenta copiar el reporte al portapapeles
@@ -649,4 +1039,306 @@ func performUpgrade() {
 		fmt.Println("\n⚠️  No rollback protection available")
 		fmt.Println("This is a fresh installation or no previous version was backed up.")
 	}
+}
+
+// listCmd es el comando para listar tareas
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List tasks for a specific date (default: today)",
+	Long: `List all tasks for a given date (default: today).
+
+Examples:
+  harvest list
+  harvest list --date 2025-07-20
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		taskManager := core.NewTaskManager()
+		date, _ := cmd.Flags().GetString("date")
+		if date == "" {
+			date = time.Now().Format("2006-01-02")
+		}
+		tasks, err := taskManager.GetTasksByDate(date)
+		if err != nil {
+			printError(err)
+			return
+		}
+		fmt.Printf("\n📅 Tasks for %s:\n", date)
+		if len(tasks) == 0 {
+			fmt.Println("  No tasks found.")
+			return
+		}
+		for _, task := range tasks {
+			icon := harvest.GetIcon(task.Category)
+			statusIcon := harvest.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
+		}
+	},
+}
+
+// editCmd es el comando para editar tareas
+var editCmd = &cobra.Command{
+	Use:   "edit [id]",
+	Short: "Edit a task by ID",
+	Long: `Edit an existing task by its ID.
+
+Examples:
+  harvest edit 1 --description "New description"
+  harvest edit 2 --hours 3.5
+  harvest edit 3 --category tech
+  harvest edit 1 --description "New desc" --hours 2.0 --category meeting
+`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		idStr := args[0]
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid task ID: %s", idStr))
+			return
+		}
+
+		taskManager := core.NewTaskManager()
+
+		// Obtener la tarea actual para mostrar información
+		task, err := taskManager.GetTaskByID(id)
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Mostrar información actual
+		icon := harvest.GetIcon(task.Category)
+		fmt.Printf("✏️  Editing task:\n")
+		fmt.Printf("[%d] %s %s (%.1fh, %s)\n\n", task.ID, icon, task.Description, task.Hours, task.Category)
+
+		// Obtener nuevos valores de los flags
+		description, _ := cmd.Flags().GetString("description")
+		hoursStr, _ := cmd.Flags().GetString("hours")
+		category, _ := cmd.Flags().GetString("category")
+
+		// Parsear horas si se proporcionó
+		var hours float64
+		if hoursStr != "" {
+			hours, err = parseHours(hoursStr)
+			if err != nil {
+				printError(fmt.Errorf("invalid hours: %s", hoursStr))
+				return
+			}
+		}
+
+		// Actualizar la tarea
+		if err := taskManager.UpdateTask(id, description, hours, category); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Task %d updated successfully", id))
+
+		// Mostrar la tarea actualizada
+		updatedTask, _ := taskManager.GetTaskByID(id)
+		if updatedTask != nil {
+			icon := harvest.GetIcon(updatedTask.Category)
+			fmt.Printf("Updated: [%d] %s %s (%.1fh, %s)\n",
+				updatedTask.ID, icon, updatedTask.Description, updatedTask.Hours, updatedTask.Category)
+		}
+	},
+}
+
+// deleteCmd es el comando para eliminar tareas
+var deleteCmd = &cobra.Command{
+	Use:   "delete [id]",
+	Short: "Delete a task by ID",
+	Long: `Delete an existing task by its ID.
+
+Examples:
+  harvest delete 1
+  harvest delete 2 --force
+`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		idStr := args[0]
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid task ID: %s", idStr))
+			return
+		}
+
+		taskManager := core.NewTaskManager()
+
+		// Obtener la tarea para mostrar información
+		task, err := taskManager.GetTaskByID(id)
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Mostrar información de la tarea a eliminar
+		icon := harvest.GetIcon(task.Category)
+		fmt.Printf("🗑️  Deleting task:\n")
+		fmt.Printf("[%d] %s %s (%.1fh, %s)\n\n", task.ID, icon, task.Description, task.Hours, task.Category)
+
+		// Verificar si se debe forzar la eliminación
+		force, _ := cmd.Flags().GetBool("force")
+
+		if !force {
+			fmt.Print("Are you sure you want to delete this task? (y/N): ")
+			var response string
+			fmt.Scanln(&response)
+
+			if strings.ToLower(strings.TrimSpace(response)) != "y" &&
+				strings.ToLower(strings.TrimSpace(response)) != "yes" {
+				printInfo("Deletion cancelled")
+				return
+			}
+		}
+
+		// Eliminar la tarea
+		if err := taskManager.DeleteTask(id); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Task %d deleted successfully", id))
+	},
+}
+
+// completeCmd es el comando para marcar tareas como completadas
+var completeCmd = &cobra.Command{
+	Use:   "complete [id]",
+	Short: "Mark a task as completed",
+	Long: `Mark an existing task as completed by its ID.
+
+Examples:
+  harvest complete 1
+  harvest complete 2 --force
+`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		idStr := args[0]
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			printError(fmt.Errorf("invalid task ID: %s", idStr))
+			return
+		}
+
+		taskManager := core.NewTaskManager()
+
+		// Obtener la tarea para mostrar información
+		task, err := taskManager.GetTaskByID(id)
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Verificar si ya está completada
+		if task.Status == harvest.StatusCompleted {
+			printInfo(fmt.Sprintf("Task %d is already completed", id))
+			return
+		}
+
+		// Mostrar información de la tarea a completar
+		icon := harvest.GetIcon(task.Category)
+		statusIcon := harvest.GetStatusIcon(task.Status)
+		fmt.Printf("✅ Completing task:\n")
+		fmt.Printf("[%d] %s %s (%.1fh, %s) %s\n\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
+
+		// Verificar si se debe forzar la completación
+		force, _ := cmd.Flags().GetBool("force")
+
+		if !force {
+			fmt.Print("Are you sure you want to mark this task as completed? (y/N): ")
+			var response string
+			fmt.Scanln(&response)
+
+			if strings.ToLower(strings.TrimSpace(response)) != "y" &&
+				strings.ToLower(strings.TrimSpace(response)) != "yes" {
+				printInfo("Completion cancelled")
+				return
+			}
+		}
+
+		// Marcar como completada
+		if err := taskManager.CompleteTask(id); err != nil {
+			printError(err)
+			return
+		}
+
+		printSuccess(fmt.Sprintf("Task %d marked as completed", id))
+	},
+}
+
+// searchCmd es el comando para buscar tareas
+var searchCmd = &cobra.Command{
+	Use:   "search [query]",
+	Short: "Search tasks by text, category, status, or date",
+	Long: `Search tasks using various criteria.
+
+Examples:
+  harvest search "bug"
+  harvest search "meeting" --category meeting
+  harvest search "" --status completed
+  harvest search "development" --category tech --status pending
+  harvest search "test" --date 2025-07-21
+`,
+	Args: cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		query := ""
+		if len(args) > 0 {
+			query = args[0]
+		}
+
+		// Obtener filtros de los flags
+		category, _ := cmd.Flags().GetString("category")
+		status, _ := cmd.Flags().GetString("status")
+		date, _ := cmd.Flags().GetString("date")
+
+		taskManager := core.NewTaskManager()
+		tasks, err := taskManager.SearchTasks(query, category, status, date)
+		if err != nil {
+			printError(err)
+			return
+		}
+
+		// Construir mensaje de búsqueda
+		var searchTerms []string
+		if query != "" {
+			searchTerms = append(searchTerms, fmt.Sprintf("text: '%s'", query))
+		}
+		if category != "" {
+			searchTerms = append(searchTerms, fmt.Sprintf("category: '%s'", category))
+		}
+		if status != "" {
+			searchTerms = append(searchTerms, fmt.Sprintf("status: '%s'", status))
+		}
+		if date != "" {
+			searchTerms = append(searchTerms, fmt.Sprintf("date: '%s'", date))
+		}
+
+		searchDescription := "all tasks"
+		if len(searchTerms) > 0 {
+			searchDescription = strings.Join(searchTerms, ", ")
+		}
+
+		fmt.Printf("🔍 Search results for %s:\n", searchDescription)
+
+		if len(tasks) == 0 {
+			fmt.Println("  No tasks found.")
+			return
+		}
+
+		// Agrupar por fecha para mejor visualización
+		currentDate := ""
+		for _, task := range tasks {
+			if task.Date != currentDate {
+				currentDate = task.Date
+				fmt.Printf("\n📅 %s:\n", currentDate)
+			}
+
+			icon := harvest.GetIcon(task.Category)
+			statusIcon := harvest.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n",
+				task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
+		}
+
+		fmt.Printf("\n📊 Found %d task(s)\n", len(tasks))
+	},
 }

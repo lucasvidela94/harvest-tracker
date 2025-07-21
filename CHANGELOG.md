@@ -1,4 +1,37 @@
 # Changelog
+## [2.0.0] - 2025-07-21
+
+### Added
+- **Migración completa a SQLite**: Base de datos robusta con índices optimizados
+- **Comando `migrate`**: Migración automática de JSON a SQLite con backup
+- **Comando `duplicate`**: Duplicar tareas con opciones de fecha (`--date`, `--yesterday`, `--tomorrow`)
+- **Comando `edit`**: Editar tareas existentes por ID con confirmación visual
+- **Comando `delete`**: Eliminar tareas con confirmación
+- **Comando `complete`**: Marcar tareas como completadas
+- **Comando `list`**: Listar tareas con IDs visibles y estados
+- **Comando `search`**: Búsqueda avanzada por texto, categoría, estado y fecha
+- **Comando `report` mejorado**: Reportes detallados por día, semana y mes con filtros
+- **Comando `export`**: Exportación a CSV y JSON con filtros avanzados
+- **Estados de tareas**: Sistema completo de estados (pendiente, en progreso, completada, pausada)
+- **Flags de fecha**: `--date`, `--yesterday`, `--tomorrow` para agregar tareas en fechas específicas
+- **Filtros avanzados**: Por categoría, estado, fecha y texto
+- **Índices de base de datos**: Optimización para búsquedas rápidas
+- **Sistema de backup**: Backup automático antes de migración
+- **Compatibilidad**: Mantiene formato legacy para Harvest app
+
+### Changed
+- **Arquitectura**: Migración de JSON a SQLite para mejor rendimiento y escalabilidad
+- **Interfaz**: IDs visibles en todos los comandos para facilitar edición
+- **Reportes**: Formato detallado con estadísticas y agrupación por fecha
+- **Búsqueda**: Búsqueda semántica con múltiples criterios
+- **Almacenamiento**: Base de datos SQLite con transacciones e integridad de datos
+
+### Fixed
+- **Rendimiento**: Búsquedas y filtros significativamente más rápidos
+- **Escalabilidad**: Soporte para miles de tareas sin degradación
+- **Integridad**: Transacciones SQLite para evitar pérdida de datos
+- **Usabilidad**: IDs visibles para facilitar la gestión de tareas
+
 ## [1.1.0] - 2025-01-08
 
 ### Added

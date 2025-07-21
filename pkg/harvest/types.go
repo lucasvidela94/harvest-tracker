@@ -11,7 +11,32 @@ type Task struct {
 	Hours       float64   `json:"hours"`
 	Category    string    `json:"category"`
 	Date        string    `json:"date"`
+	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+// Estados de tareas
+const (
+	StatusPending    = "pending"
+	StatusInProgress = "in_progress"
+	StatusCompleted  = "completed"
+	StatusPaused     = "paused"
+)
+
+// StatusIcon mapea estados a iconos
+var StatusIcon = map[string]string{
+	StatusPending:    "⏳",
+	StatusInProgress: "🔄",
+	StatusCompleted:  "✅",
+	StatusPaused:     "⏸️",
+}
+
+// GetStatusIcon devuelve el icono para un estado
+func GetStatusIcon(status string) string {
+	if icon, exists := StatusIcon[status]; exists {
+		return icon
+	}
+	return StatusIcon[StatusPending] // default
 }
 
 // Config representa la configuración del usuario
