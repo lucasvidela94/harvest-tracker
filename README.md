@@ -1,12 +1,52 @@
 # 🌾 Harvest CLI
 
-Una herramienta de línea de comandos moderna y eficiente para gestionar tareas y reportes de tiempo, diseñada para integrarse con Harvest.
+**Una herramienta de línea de comandos enterprise para el seguimiento de tareas y generación de reportes para Harvest.**
+
+[![Release](https://img.shields.io/github/v/release/lucasvidela94/harvest-tracker)](https://github.com/lucasvidela94/harvest-tracker/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lucasvidela94/harvest-tracker)](https://goreportcard.com/report/github.com/lucasvidela94/harvest-tracker)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > **✨ Proyecto completamente migrado a Go** - Mejor rendimiento, mantenibilidad y distribución multiplataforma.
 
-## 🚀 Instalación Rápida
+## 🚀 **Instalación Enterprise**
 
-### Opción 1: Instalación con Binario Pre-compilado (Recomendada)
+### **Instalación Automática (Recomendada)**
+```bash
+# Instalar la última versión automáticamente
+curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash
+```
+
+### **Instalación Manual**
+```bash
+# Descargar para tu plataforma
+wget https://github.com/lucasvidela94/harvest-tracker/releases/latest/download/harvest-$(curl -s https://api.github.com/repos/lucasvidela94/harvest-tracker/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz
+
+# Extraer e instalar
+tar -xzf harvest-*.tar.gz
+sudo mv harvest-*/harvest /usr/local/bin/
+```
+
+### **Verificar Instalación**
+```bash
+harvest version
+harvest --help
+```
+
+## 🔄 **Auto-Update**
+
+Harvest CLI se actualiza automáticamente:
+
+```bash
+# Verificar actualizaciones
+harvest check-update
+
+# Actualizar a la última versión
+harvest upgrade
+```
+
+## 🚀 Instalación desde Código Fuente
+
+### Opción 1: Instalación con Binario Pre-compilado (Desarrollo)
 
 **No requiere Go instalado - ¡Más fácil!**
 
