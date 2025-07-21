@@ -48,6 +48,13 @@ test-no-go:
 	docker run --rm --name harvest-test-no-go-container harvest-test-no-go /test/test-no-go.sh
 	@echo "✅ Test de instalación sin Go completado"
 
+# Test de producción exhaustivo
+test-production:
+	@echo "🏭 Ejecutando test de producción exhaustivo..."
+	docker build -f Dockerfile.test-no-go -t harvest-test-no-go .
+	docker run --rm --name harvest-test-production-container harvest-test-no-go /test/test-production.sh
+	@echo "✅ Test de producción completado"
+
 # Ayuda
 test-help:
 	@echo "📋 Comandos disponibles para testing:"
@@ -57,5 +64,6 @@ test-help:
 	@echo "  make test-quick     - Test rápido (solo básicos)"
 	@echo "  make test-migration - Test específico de migración"
 	@echo "  make test-no-go     - Test de instalación sin Go"
+	@echo "  make test-production - Test de producción exhaustivo"
 	@echo "  make test-clean     - Limpiar recursos de test"
 	@echo "  make test-help      - Mostrar esta ayuda" 

@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     tar \
     gzip \
     unzip \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Crear directorio de trabajo
@@ -15,8 +16,10 @@ WORKDIR /test
 # Copiar los scripts de test
 COPY install-binary.sh /test/
 COPY test-no-go.sh /test/
+COPY test-production.sh /test/
 RUN chmod +x /test/install-binary.sh
 RUN chmod +x /test/test-no-go.sh
+RUN chmod +x /test/test-production.sh
 
 # Copiar el directorio de releases
 COPY releases/ /test/releases/
