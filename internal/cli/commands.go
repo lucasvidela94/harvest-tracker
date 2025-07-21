@@ -367,6 +367,30 @@ func showStatus(taskManager *core.TaskManager) {
 	}
 }
 
+// showStatusSQLite muestra el estado actual para SQLite
+func showStatusSQLite(taskManager *core.TaskManagerSQLite) {
+	todayTasks, err := taskManager.GetTodayTasks()
+	if err != nil {
+		printError(err)
+		return
+	}
+
+	totalHours := taskManager.GetTotalHours(todayTasks)
+	targetHours := taskManager.GetDailyHoursTarget()
+
+	fmt.Printf("\n📊 Today's Status: %.1fh / %.1fh (%.1fh remaining)\n",
+		totalHours, targetHours, targetHours-totalHours)
+
+	if len(todayTasks) > 0 {
+		fmt.Println("\n📝 Today's tasks:")
+		for _, task := range todayTasks {
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s - %.1fh (%s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
+		}
+	}
+}
+
 // statusCmd es el comando para mostrar el estado
 var statusCmd = &cobra.Command{
 	Use:   "status",
@@ -379,13 +403,70 @@ Displays:
 - Remaining hours
 - List of today's tasks with icons`,
 	Run: func(cmd *cobra.Command, args []string) {
-		taskManager := core.NewTaskManager()
-		showDetailedStatus(taskManager)
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
+		showDetailedStatusSQLite(taskManager)
 	},
 }
 
 // showDetailedStatus muestra el estado detallado
 func showDetailedStatus(taskManager *core.TaskManager) {
+	todayTasks, err := taskManager.GetTodayTasks()
+	if err != nil {
+		printError(err)
+		return
+	}
+
+	totalHours := taskManager.GetTotalHours(todayTasks)
+	targetHours := taskManager.GetDailyHoursTarget()
+	remainingHours := targetHours - totalHours
+
+	// Mostrar fecha
+	fmt.Printf("📅 Today (%s): %.2fh / %.1fh\n",
+		time.Now().Format("2006-01-02"), totalHours, targetHours)
+
+	// Mostrar horas restantes
+	if remainingHours > 0 {
+		fmt.Printf("📈 Remaining: %.2fh\n", remainingHours)
+	} else if remainingHours < 0 {
+		fmt.Printf("📈 Overtime: %.2fh\n", -remainingHours)
+	} else {
+		fmt.Printf("📈 Perfect! Target reached\n")
+	}
+
+	// Mostrar tareas
+	if len(todayTasks) > 0 {
+		for _, task := range todayTasks {
+			icon := workflow.GetIcon(task.Category)
+			statusIcon := workflow.GetStatusIcon(task.Status)
+			fmt.Printf("  [%d] %s %s (%.1fh, %s) %s\n", task.ID, icon, task.Description, task.Hours, task.Category, statusIcon)
+		}
+	} else {
+		fmt.Println("  No tasks for today")
+	}
+
+	// Mostrar barra de progreso
+	percentage := (totalHours / targetHours) * 100
+	if percentage > 100 {
+		percentage = 100
+	}
+
+	barLength := 20
+	filledLength := int((percentage / 100) * float64(barLength))
+
+	fmt.Printf("📊 [")
+	for i := 0; i < barLength; i++ {
+		if i < filledLength {
+			fmt.Print("█")
+		} else {
+			fmt.Print("░")
+		}
+	}
+	fmt.Printf("] %.1f%%\n", percentage)
+}
+
+// showDetailedStatusSQLite muestra el estado detallado para SQLite
+func showDetailedStatusSQLite(taskManager *core.TaskManagerSQLite) {
 	todayTasks, err := taskManager.GetTodayTasks()
 	if err != nil {
 		printError(err)
@@ -462,14 +543,15 @@ Examples:
 		}
 
 		// Agregar tarea técnica
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		if err := taskManager.AddTask(description, hours, "tech", ""); err != nil {
 			printError(err)
 			return
 		}
 
 		printSuccess(fmt.Sprintf("Added tech task: %s (%.1fh)", description, hours))
-		showStatus(taskManager)
+		showStatusSQLite(taskManager)
 	},
 }
 
@@ -495,14 +577,15 @@ Examples:
 		}
 
 		// Agregar tarea de reunión
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		if err := taskManager.AddTask(description, hours, "meeting", ""); err != nil {
 			printError(err)
 			return
 		}
 
 		printSuccess(fmt.Sprintf("Added meeting: %s (%.1fh)", description, hours))
-		showStatus(taskManager)
+		showStatusSQLite(taskManager)
 	},
 }
 
@@ -528,14 +611,15 @@ Examples:
 		}
 
 		// Agregar tarea de QA
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		if err := taskManager.AddTask(description, hours, "qa", ""); err != nil {
 			printError(err)
 			return
 		}
 
 		printSuccess(fmt.Sprintf("Added QA task: %s (%.1fh)", description, hours))
-		showStatus(taskManager)
+		showStatusSQLite(taskManager)
 	},
 }
 
@@ -550,7 +634,8 @@ duration configured in your settings.`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Obtener duración del daily desde configuración
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 		dailyHours := taskManager.GetDailyStandupHours()
 
 		// Agregar tarea de daily
@@ -560,7 +645,7 @@ duration configured in your settings.`,
 		}
 
 		printSuccess(fmt.Sprintf("Added daily standup (%.2fh)", dailyHours))
-		showStatus(taskManager)
+		showStatusSQLite(taskManager)
 	},
 }
 
@@ -1119,7 +1204,8 @@ Examples:
 			return
 		}
 
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 
 		// Obtener la tarea actual para mostrar información
 		task, err := taskManager.GetTaskByID(id)
@@ -1185,7 +1271,8 @@ Examples:
 			return
 		}
 
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 
 		// Obtener la tarea para mostrar información
 		task, err := taskManager.GetTaskByID(id)
@@ -1243,7 +1330,8 @@ Examples:
 			return
 		}
 
-		taskManager := core.NewTaskManager()
+		taskManager := core.NewTaskManagerSQLite()
+		defer taskManager.Close()
 
 		// Obtener la tarea para mostrar información
 		task, err := taskManager.GetTaskByID(id)
