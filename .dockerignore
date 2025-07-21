@@ -1,26 +1,20 @@
+# Archivos y directorios a ignorar en el build de Docker
+
 # Archivos de desarrollo
 .git/
 .gitignore
 README.md
 CHANGELOG.md
 LICENSE
-SCOPE.md
+Makefile
+*.md
 
-# Archivos de build
-build/
-# releases/ - INCLUIR para tests
-*.tar.gz
-*.zip
-*.exe
-
-# Archivos de configuración local
-.env
-*.log
-
-# Archivos de test (incluir los que necesitamos)
-# test.sh - INCLUIR
-# Dockerfile.test - INCLUIR  
-# Makefile.test - INCLUIR
+# Archivos de configuración de desarrollo
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # Archivos temporales
 *.tmp
@@ -28,16 +22,35 @@ build/
 .DS_Store
 Thumbs.db
 
-# Archivos de IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Logs
+*.log
 
-# Archivos de datos de usuario (se crean en runtime)
-~/.harvest/
-.harvest/
+# Archivos de test
+test-*.sh
+test-*.csv
+test-*.json
 
-# Archivos de exportación
-*.csv
-*.json 
+# Archivos de release (se descargarán automáticamente)
+releases/
+
+# Archivos de backup
+*.backup
+backup/
+
+# Archivos de configuración local
+.env
+config.local.json
+
+# Archivos de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Archivos de cache
+.cache/
+*.cache 

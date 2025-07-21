@@ -1,14 +1,25 @@
 # Changelog
-## [2.0.1] - 2025-07-21
+## [1.0.0] - 2025-07-21
 
-### Fixed
-- **SQLite Integration**: Fixed `list` and `search` commands to use SQLite instead of JSON
-- **Production Testing**: Improved test reliability and debugging
-- **Release Process**: Cleaned up release generation to avoid "dirty" tags
+### Added
+- **Enterprise CLI Tool**: Harvest CLI como herramienta enterprise completa
+- **Auto-Installation**: Instalador automático multiplataforma
+- **Auto-Update**: Sistema de actualización automática
+- **SQLite Integration**: Base de datos robusta con índices optimizados
+- **Multiplatform Support**: Soporte para Linux, macOS y Windows
+- **Enterprise Features**: Distribución profesional con checksums
+
+### Features
+- **One-liner Installation**: `curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash`
+- **Auto-Update Commands**: `harvest check-update` y `harvest upgrade`
+- **Complete Task Management**: add, list, search, edit, delete, report
+- **SQLite Database**: Rendimiento optimizado y escalabilidad
+- **Professional Distribution**: Releases con archivos binarios y checksums
 
 ### Changed
-- **Version**: Bumped to 2.0.1 for stable release
-- **Testing**: Enhanced production test with better verification
+- **Architecture**: Migración completa a Go para mejor rendimiento
+- **Distribution**: Sistema enterprise similar a kubectl/docker
+- **Installation**: Sin dependencias externas, solo binario
 
 ## [2.0.0] - 2025-07-21
 
