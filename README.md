@@ -32,6 +32,27 @@ harvest version
 harvest --help
 ```
 
+## 🏢 **Características Enterprise**
+
+### **✅ Funcionalidades Avanzadas**
+- **SQLite Database**: Base de datos robusta y escalable
+- **Búsqueda Avanzada**: Por texto, categoría, estado y fecha
+- **Gestión Completa**: Editar, eliminar, duplicar tareas
+- **Exportación**: CSV y JSON con filtros avanzados
+- **Estados de Tareas**: Pendiente, en progreso, completada, pausada
+- **Migración Automática**: De JSON a SQLite con backup
+
+### **✅ Distribución Profesional**
+- **One-liner Installation**: Instalación automática multiplataforma
+- **Auto-Update**: Sistema de actualización automática
+- **Checksums**: Verificación de integridad de archivos
+- **Multiplatform**: Linux, macOS, Windows (amd64, arm64)
+
+### **✅ Integración Enterprise**
+- **CI/CD Ready**: Fácil integración en pipelines
+- **Docker Support**: Contenedores listos para producción
+- **API Integration**: Preparado para integraciones futuras
+
 ## 🔄 **Auto-Update**
 
 Harvest CLI se actualiza automáticamente:
@@ -88,20 +109,35 @@ make install
 Una vez instalado, puedes usar `harvest` desde cualquier lugar:
 
 ```bash
-# Ver ayuda
+# Ver ayuda completa
 harvest --help
 
-# Agregar una tarea
+# Agregar tareas
 harvest add "Desarrollar nueva funcionalidad" 4.0
+harvest tech "API development" 3.5
+harvest meeting "Sprint planning" 1.5
+harvest qa "Testing new features" 2.0
+harvest daily
 
-# Ver estado actual
+# Ver estado y progreso
 harvest status
 
-# Generar reporte para Harvest
-harvest report
+# Gestionar tareas
+harvest list                    # Listar todas las tareas
+harvest list --date 2025-07-21  # Tareas de fecha específica
+harvest search "bug"            # Buscar tareas
+harvest edit 1 --hours 3.0      # Editar tarea por ID
+harvest delete 2                # Eliminar tarea
+harvest complete 3              # Marcar como completada
 
-# Actualizar a la última versión
-harvest upgrade
+# Reportes y exportación
+harvest report                  # Reporte para Harvest
+harvest export --format csv     # Exportar a CSV
+harvest export --format json    # Exportar a JSON
+
+# Actualización
+harvest check-update            # Verificar actualizaciones
+harvest upgrade                 # Actualizar automáticamente
 ```
 
 ## 🚀 Flujo de Trabajo Diario - Un Día en la Vida de un Dev

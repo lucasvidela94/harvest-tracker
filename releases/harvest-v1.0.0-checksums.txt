@@ -22,3 +22,9 @@ bee0ff78a02bd52a69fbd10539a162d3438cb79542daa044c4573d3efbc08de7  harvest-v2.0.1
 df8a069e96a33891a688146f6c80fa5dbfefba05bbca7be93fda1a5af4827dff  harvest-v1.0.0-windows-amd64.zip
 eeb79b0d0ac5851f9b974f393f6492b0a893889737fcc867df5c39c302735db6  harvest-v2.0.0-windows-amd64.zip
 e007aebb9e52430e79ea65ef0544a53a6bc03c8404f556456d3f749659e8edf6  harvest-v2.0.1-windows-amd64.zip
+aee1f81bfa383cf27fc407f76e1e470d171f7523100ab148db5264e59348f9a5  harvest-v1.0.0-darwin-amd64.tar.gz
+a1904449f22b5e2ff8a9a69f50d3d594e51323384d974cdd74b60fe7882dc616  harvest-v1.0.0-darwin-arm64.tar.gz
+e5d517e2b57c4532b2e0914507b622fc1b8b7cc397e8c3b8fd6749cd4fab2ac3  harvest-v1.0.0-linux-amd64.tar.gz
+38c9c9ff7245fb73ae0e64a9a6a8caeda7ae15c33ff8422db543272f5172aecf  harvest-v1.0.0-linux-arm64.tar.gz
+03e0f9a3ee9e54d739e0a5687e9012e144c0d6074cac28a4fd4d8fc50a884cfe  harvest-v1.0.0-windows-amd64.tar.gz
+5d83def054daa2d9a6b7bfcedbdf6b835fb10b67f3de9d2aad9a7e2f3682d4ce  harvest-v1.0.0-windows-amd64.zip

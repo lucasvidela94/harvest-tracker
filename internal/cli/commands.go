@@ -30,27 +30,49 @@ func Execute() error {
 // init inicializa los comandos
 func init() {
 	// Comando de ayuda personalizado
-	rootCmd.SetHelpTemplate(`🌾 Harvest CLI
+	rootCmd.SetHelpTemplate(`🌾 Harvest CLI - Enterprise Task Management Tool
 
 Usage:
   harvest [command] [args...]
 
 Available Commands:
-  add       Add a new task
-  tech      Add a technical task
-  meeting   Add a meeting task
-  qa        Add a QA/testing task
-  daily     Add daily standup
-  status    Show today's status
-  report    Generate report for Harvest
-  upgrade   Upgrade to latest version
+  add         Add a new task with description and hours
+  tech        Add a technical development task
+  meeting     Add a meeting or collaboration task
+  qa          Add a QA/testing task
+  daily       Add daily standup meeting
+  status      Show today's task status and progress
+  report      Generate detailed report for Harvest
+  list        List tasks with filters (date, category, status)
+  search      Search tasks by text, category, or status
+  edit        Edit existing task (description, hours, category)
+  delete      Delete a task with confirmation
+  complete    Mark task as completed
+  duplicate   Duplicate a task with date options
+  export      Export tasks to CSV/JSON format
+  migrate     Migrate from JSON to SQLite database
+  upgrade     Upgrade to latest version
+  check-update Check for available updates
+  version     Show version information
+
+Enterprise Features:
+  • SQLite Database: Fast and scalable task storage
+  • Auto-Update: Automatic version management
+  • Multiplatform: Linux, macOS, Windows support
+  • Professional Distribution: One-liner installation
 
 Examples:
-  harvest add "Fix bug" 2.0
-  harvest tech "Development" 3.5
-  harvest meeting "Team sync" 1.0
+  harvest add "Fix critical bug" 2.0
+  harvest tech "API development" 4.0
+  harvest meeting "Sprint planning" 1.5
   harvest status
   harvest report
+  harvest list --date 2025-07-21
+  harvest search "bug"
+  harvest export --format csv
+
+Installation:
+  curl -fsSL https://raw.githubusercontent.com/lucasvidela94/harvest-tracker/main/install-latest.sh | bash
 
 Use "harvest [command] --help" for more information about a command.
 `)
