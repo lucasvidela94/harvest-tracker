@@ -8,7 +8,7 @@ import (
 )
 
 // Version es la versión actual del CLI
-var Version = "1.0.1"
+var Version = "1.1.0"
 
 func main() {
 	if err := cli.Execute(); err != nil {
