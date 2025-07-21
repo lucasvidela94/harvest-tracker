@@ -1,0 +1,53 @@
+# Makefile para testing con Docker
+.PHONY: test test-build test-run test-clean test-shell
+
+# Variables
+IMAGE_NAME = harvest-test
+CONTAINER_NAME = harvest-test-container
+
+# Construir imagen de test
+test-build:
+	@echo "🔨 Construyendo imagen de test..."
+	docker build -f Dockerfile.test -t $(IMAGE_NAME) .
+	@echo "✅ Imagen construida: $(IMAGE_NAME)"
+
+# Ejecutar tests
+test-run: test-build
+	@echo "🧪 Ejecutando tests..."
+	docker run --rm --name $(CONTAINER_NAME) $(IMAGE_NAME)
+	@echo "✅ Tests completados"
+
+# Ejecutar tests con shell interactivo
+test-shell: test-build
+	@echo "🐚 Iniciando shell interactivo para testing..."
+	docker run --rm -it --name $(CONTAINER_NAME) $(IMAGE_NAME) /bin/bash
+
+# Limpiar recursos de test
+test-clean:
+	@echo "🧹 Limpiando recursos de test..."
+	docker rmi $(IMAGE_NAME) 2>/dev/null || true
+	docker container prune -f 2>/dev/null || true
+	@echo "✅ Limpieza completada"
+
+# Test rápido (solo comandos básicos)
+test-quick: test-build
+	@echo "⚡ Ejecutando test rápido..."
+	docker run --rm --name $(CONTAINER_NAME) $(IMAGE_NAME) bash -c "harvest version && harvest add 'Quick test' 1.0 && harvest status && harvest report --harvest"
+	@echo "✅ Test rápido completado"
+
+# Test de migración específico
+test-migration: test-build
+	@echo "🔄 Ejecutando test de migración..."
+	docker run --rm --name $(CONTAINER_NAME) $(IMAGE_NAME) bash -c "echo 'Creando datos JSON viejos...' && mkdir -p ~/.harvest && echo '[{\"id\":1,\"description\":\"Old task\",\"hours\":2.0,\"category\":\"general\",\"date\":\"2025-07-21\",\"created_at\":\"2025-07-21T10:00:00Z\"}]' > ~/.harvest/tasks.json && echo 'Ejecutando migración...' && harvest migrate --dry-run && echo 'Migración exitosa!'"
+	@echo "✅ Test de migración completado"
+
+# Ayuda
+test-help:
+	@echo "📋 Comandos disponibles para testing:"
+	@echo "  make test-build     - Construir imagen de test"
+	@echo "  make test-run       - Ejecutar todos los tests"
+	@echo "  make test-shell     - Shell interactivo para testing"
+	@echo "  make test-quick     - Test rápido (solo básicos)"
+	@echo "  make test-migration - Test específico de migración"
+	@echo "  make test-clean     - Limpiar recursos de test"
+	@echo "  make test-help      - Mostrar esta ayuda" 

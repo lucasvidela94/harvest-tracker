@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+# Instalar dependencias básicas
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crear directorio de trabajo
+WORKDIR /test
+
+# Copiar el binario de harvest
+COPY harvest /usr/local/bin/
+RUN chmod +x /usr/local/bin/harvest
+
+# Copiar script de test
+COPY test.sh /test/
+RUN chmod +x /test/test.sh
+
+# Crear directorio para datos de test
+RUN mkdir -p /test/data
+
+# Comando por defecto
+CMD ["/test/test.sh"] 
