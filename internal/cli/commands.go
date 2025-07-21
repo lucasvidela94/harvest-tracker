@@ -222,7 +222,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🌾 workflow CLI v1.0.1")
+		fmt.Printf("🌾 workflow CLI v%s\n", core.Version)
 		fmt.Println("Built with Go")
 		fmt.Println("Migrated from Python to Go")
 	},

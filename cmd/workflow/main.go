@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"github.com/lucasvidela94/workflow-cli/internal/cli"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
 )
 
-// Version es la versión actual del CLI
-var Version = "1.1.0"
+// Version es la versión actual del CLI (usando la versión centralizada)
+var Version = core.Version
 
 func main() {
 	if err := cli.Execute(); err != nil {

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v62/github"
+	"github.com/lucasvidela94/workflow-cli/internal/core"
 )
 
 const (
@@ -16,9 +17,10 @@ const (
 	RepoOwner = "lucasvidela94"
 	// RepoName es el nombre del repositorio
 	RepoName = "workflow-cli"
-	// CurrentVersion es la versión actual de Go
-	CurrentVersion = "1.0.1"
 )
+
+// CurrentVersion es la versión actual del CLI (usando la versión centralizada)
+var CurrentVersion = core.Version
 
 // VersionManager maneja la detección y comparación de versiones
 type VersionManager struct {
