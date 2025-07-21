@@ -200,7 +200,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🌾 Harvest CLI v2.0.0")
+		fmt.Println("🌾 Harvest CLI v1.0.0")
 		fmt.Println("Built with Go")
 		fmt.Println("Migrated from Python to Go")
 	},
